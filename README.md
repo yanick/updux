@@ -2,7 +2,7 @@
 # What's Updux?
 
 So, I'm a fan of [Redux][]. Two days ago I discovered
-[rematch][] alonside a few other frameworks built atop Redux. 
+[rematch](https://rematch.github.io/rematch) alonside a few other frameworks built atop Redux. 
 
 It has a couple of pretty good ideas that removes some of the 
 boilerplate. Keeping mutations and asynchronous effects close to the 
