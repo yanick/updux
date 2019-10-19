@@ -9,12 +9,12 @@ function actionFor(type) {
   };
 }
 
-function buildInitial({initial = {}, reducers = {}}) {
+function buildInitial({initial = {}, subduxes = {}}) {
   let state = initial;
 
   if (fp.isPlainObject(initial)) {
     initial = fp.mergeAll([
-      fp.mapValues(fp.getOr({}, 'initial'), reducers),
+      fp.mapValues(fp.getOr({}, 'initial'), subduxes),
       initial,
     ]);
   }
@@ -22,8 +22,8 @@ function buildInitial({initial = {}, reducers = {}}) {
   return initial;
 }
 
-function buildActions({mutations = {}, reducers = {}}) {
-  let actions = fp.mergeAll(fp.map(fp.getOr({}, 'actions'), reducers)) || {};
+function buildActions({mutations = {}, subduxes = {}}) {
+  let actions = fp.mergeAll(fp.map(fp.getOr({}, 'actions'), subduxes)) || {};
 
   Object.keys(mutations).forEach(type => {
     if (!actions[type]) {
@@ -34,41 +34,71 @@ function buildActions({mutations = {}, reducers = {}}) {
   return actions;
 }
 
-function buildMutations({mutations = {}, reducers = {}}) {
-  let subMut = {};
+const composeMutations = (m1,m2) =>
+        (payload=null,action={}) => state => m2(payload,action)(
+            m1(payload,action)(state) );
 
-  for (let slice in reducers) {
-    for (let mutation in reducers[slice].mutations) {
-      subMut = u(
-        {
-          [mutation]: {
-            [slice]: u.constant(reducers[slice].mutations[mutation]),
-          },
-        },
-        subMut,
-      );
-    }
-  }
+function buildMutations({mutations = {}, subduxes = {}}) {
+  // we have to differentiate the subduxes with '*' than those
+  // without, as the root '*' is not the same as any sub-'*'
 
-  subMut = fp.mapValues(updates => action =>
-    u(fp.mapValues(f => f(action))(updates)),
-  )(subMut);
+    const actions = fp.uniq( Object.keys(mutations).concat(
+        ...Object.values( subduxes ).map( ({mutations}) => Object.keys(mutations) )
+    ) );
 
-  for (let name in mutations) {
-    if (subMut[name]) {
-      const pre = subMut[name];
+    // let's seed with noops
+    let mergedMutations = {};
 
-      subMut[name] = action => state =>
-        mutations[name](action)(pre(action)(state));
-    } else {
-      subMut[name] = mutations[name];
-    }
-  }
+    actions.forEach( action => {
+        mergedMutations[action] = () => state => state;
+    });
 
-  return subMut;
+
+    console.log(mergedMutations);
+
+    Object.entries( subduxes ).forEach( ([slice, {mutations,reducer}]) => {
+
+        if( mutations['*'] ) {
+            const localized = (payload=null,action={}) => u.updateIn( slice, mutations['*'](payload,action) );
+                console.log("b");
+                mergedMutations = fp.mapValues(
+                    mutation => composeMutations(
+                        (dummy,action) => u.updateIn(slice,
+                            state => reducer(state,action)
+                        ), mutation )
+                )(mergedMutations);
+            return;
+        }
+
+        Object.entries(mutations).forEach(([type,mutation]) => {
+            const localized = (payload=null,action={}) => u.updateIn( slice, mutation(payload,action) );
+
+            if( type !== '*' ) {
+                console.log("a");
+
+                mergedMutations[type] = composeMutations(
+                    localized, mergedMutations[type]
+                )
+            }
+            else {
+            }
+        })
+    });
+    console.log(mergedMutations);
+
+    Object.entries(mutations).forEach(([type,mutation]) => {
+        console.log(type,":",mutation,":",mergedMutations[type]);
+
+                mergedMutations[type] = composeMutations(
+                    mergedMutations[type], mutation
+                )
+    });
+
+    return mergedMutations;
+
 }
 
-function buildMiddleware({effects={},reducers={}},{actions}) {
+function buildMiddleware({effects={},subduxes={}},{actions}) {
     return api => {
 
         for ( let type in actions ) {
@@ -79,14 +109,12 @@ function buildMiddleware({effects={},reducers={}},{actions}) {
     return [
         ...fp.toPairs(effects).map(([type,effect])=> {
         return api => next => action => {
-            console.log(action);
-
             if( action.type !== type ) return next(action);
 
             return effect(api)(next)(action);
         };
     }),
-        ...fp.map( 'middleware', reducers )
+        ...fp.map( 'middleware', subduxes )
     ].filter(x=>x).reduceRight( (next,mw) => mw(api)(next), original_next )
     }}
 }
@@ -100,7 +128,7 @@ function updux(config) {
 
   dux.mutations = buildMutations(config);
 
-  dux.upreducer = action => state => {
+  dux.upreducer = (action={}) => state => {
     if (state === null) state = dux.initial;
 
     const a =

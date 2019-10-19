@@ -55,7 +55,7 @@ test( 'sub reducers', () => {
     });
 
     const { initial, actions, reducer } = updux({
-        reducers: {
+        subduxes: {
             foo, bar
         }
     });
@@ -99,7 +99,7 @@ test('precedence between root and sub-reducers', () => {
                 }
             }
         },
-        reducers: {
+        subduxes: {
             foo: updux({
                 initial: {
                     bar: 2,
@@ -135,26 +135,21 @@ test( 'middleware', async () => {
         mutations: {
             inc: (addition) => state => state + addition,
             doEeet: () => state => {
-                console.log("up", state);
-
                 return state + 'Z';
             },
         },
         effects: {
             doEeet: api => next => async action => {
-                console.log(api);
                 api.dispatch.inc('a');
                 next(action);
                 await timeout(1000);
                 api.dispatch.inc('c');
             }
         },
-        reducers: {
+        subduxes: {
             foo: updux({
                 effects: {
                     doEeet: (api) => next => action => {
-                        console.log("in foo",api);
-
                         api.dispatch({ type: 'inc', payload: 'b'});
                         next(action);
                     }
@@ -164,8 +159,6 @@ test( 'middleware', async () => {
     });
 
     const store = createStore();
-
-    console.log(store);
 
     store.dispatch.doEeet();
 

@@ -11,5 +11,8 @@
     "lodash": "^4.17.15",
     "redux": "^4.0.4",
     "updeep": "^1.2.0"
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-pipeline-operator": "^7.5.0"
   }
 }
