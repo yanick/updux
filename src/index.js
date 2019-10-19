@@ -34,9 +34,10 @@ function buildActions({mutations = {}, subduxes = {}}) {
   return actions;
 }
 
-const composeMutations = (m1,m2) =>
+const composeMutations = mutations =>
+    mutations.reduce( (m1,m2) =>
         (payload=null,action={}) => state => m2(payload,action)(
-            m1(payload,action)(state) );
+            m1(payload,action)(state) ));
 
 function buildMutations({mutations = {}, subduxes = {}}) {
   // we have to differentiate the subduxes with '*' than those
@@ -46,55 +47,38 @@ function buildMutations({mutations = {}, subduxes = {}}) {
         ...Object.values( subduxes ).map( ({mutations}) => Object.keys(mutations) )
     ) );
 
-    // let's seed with noops
     let mergedMutations = {};
 
+    let [ globby, nonGlobby ] = fp.partition(
+        ([_,{mutations}]) => mutations['*'],
+        Object.entries(subduxes)
+    );
+
+    globby = globby |> fp.fromPairs |> fp.mapValues(
+        ({reducer}) => (_,action={}) => state =>
+            reducer(state,action) );
+
+    const globbyMutation = (payload,action) => u(
+        globby |> fp.mapValues( mut => mut(payload,action) )
+    );
+
     actions.forEach( action => {
-        mergedMutations[action] = () => state => state;
+        mergedMutations[action] = [ globbyMutation ]
     });
 
-
-    console.log(mergedMutations);
-
-    Object.entries( subduxes ).forEach( ([slice, {mutations,reducer}]) => {
-
-        if( mutations['*'] ) {
-            const localized = (payload=null,action={}) => u.updateIn( slice, mutations['*'](payload,action) );
-                console.log("b");
-                mergedMutations = fp.mapValues(
-                    mutation => composeMutations(
-                        (dummy,action) => u.updateIn(slice,
-                            state => reducer(state,action)
-                        ), mutation )
-                )(mergedMutations);
-            return;
-        }
-
+    nonGlobby.forEach( ([slice, {mutations,reducer}]) => {
         Object.entries(mutations).forEach(([type,mutation]) => {
             const localized = (payload=null,action={}) => u.updateIn( slice, mutation(payload,action) );
 
-            if( type !== '*' ) {
-                console.log("a");
-
-                mergedMutations[type] = composeMutations(
-                    localized, mergedMutations[type]
-                )
-            }
-            else {
-            }
+            mergedMutations[type].push(localized);
         })
     });
-    console.log(mergedMutations);
 
     Object.entries(mutations).forEach(([type,mutation]) => {
-        console.log(type,":",mutation,":",mergedMutations[type]);
-
-                mergedMutations[type] = composeMutations(
-                    mergedMutations[type], mutation
-                )
+            mergedMutations[type].push(mutation);
     });
 
-    return mergedMutations;
+    return mergedMutations |> fp.mapValues( composeMutations );
 
 }
 
