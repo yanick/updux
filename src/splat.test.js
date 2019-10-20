@@ -7,7 +7,7 @@ test( 'mutations, simple', () => {
     const dux = updux({
         mutations: {
             foo: () => tracer('a'),
-            '*': (p,a) => { console.log(a); return tracer('b') },
+            '*': (p,a) => tracer('b'),
         },
     });
 
@@ -28,7 +28,7 @@ test( 'with subduxes', () => {
     const dux = updux({
         mutations: {
             foo: () => tracer('a'),
-            '*': (dummy,a) => { console.log("got XXX " ,a); return tracer('b') },
+            '*': (dummy,a) => tracer('b'),
             bar: () => ({bar}) => ({ bar, tracer: bar.tracer })
         },
         subduxes: {
