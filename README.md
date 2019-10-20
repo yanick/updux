@@ -30,16 +30,27 @@ const {
     middleware,
     createStore,
 } = updux({ 
-    initial: {},
+    initial: {
+        counter: 0,
+    },
     subduxes: {
         otherUpdux,
     },
     mutations: {
+        inc: ( increment = 1 ) => u({counter: s => s + increment })
     },
     effects: {
+        '*' => api => next => action => {
+            console.log( "hey, look, an action zoomed by!", action );
+            next(action);
+        };
     },
 
-})
+});
+
+const store = createStore();
+
+store.dispatch.inc(3);
 ```
 
 # Description
@@ -244,10 +255,6 @@ store.dispatch.addTodo(...);
 store.dispatch( actions.addTodo(...) );
 ```
 
-
-
-
-
 # Example
 
 #### battle.js
@@ -260,7 +267,7 @@ import log from './log';
 import bogeys from './bogeys';
 
 const { createStore } = updux({
-    reducers: { game, log, bogeys }
+    subduxes: { game, log, bogeys }
 })
 
 export default createStore;
@@ -275,7 +282,6 @@ import _ from 'lodash';
 import u from 'updeep';
 
 import { calculateMovement } from 'game/rules';
-
 
 export default updux({
     initial: { game: "", players: [], turn: 0, },
@@ -305,13 +311,12 @@ export default updux({
 
 #### log.js
 
-
 ```
 import { updux } from 'updux';
 
 export default updux({
     initial: [],
-    actions: {
+    mutations: {
         '*': (payload,action) => state => [ ...state, action ],
     },
 });
@@ -353,6 +358,5 @@ battle.dispatch.play_game();
 
 
 [Redux]: https://redux.js.org
-[rematch]: https://rematch.github.io
 [Updeep]: https://github.com/substantial/updeep
 [VueX]: https://vuex.vuejs.org/
