@@ -9,6 +9,7 @@
     "babel-jest": "^24.9.0",
     "jest": "^24.9.0",
     "lodash": "^4.17.15",
+    "memoize-getters": "^1.1.0",
     "redux": "^4.0.4",
     "updeep": "^1.2.0"
   },
