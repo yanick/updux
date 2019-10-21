@@ -7,8 +7,9 @@ const MiddlewareFor = (type,mw) => api => next => action => {
 };
 
 export default function buildMiddleware(
-  {effects = {}, subduxes = {}},
-  {actions},
+    effects = {},
+    actions = {},
+    subduxes = {},
 ) {
   return api => {
     for (let type in actions) {

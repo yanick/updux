@@ -1,7 +1,7 @@
 import fp from 'lodash/fp';
 import u from 'updeep';
 
-import { createStore, applyMiddleware } from 'redux';
+import { createStore as reduxCreateStore, applyMiddleware } from 'redux';
 
 import buildMiddleware from './buildMiddleware';
 
@@ -47,18 +47,18 @@ const composeMutations = mutations =>
         (payload=null,action={}) => state => m2(payload,action)(
             m1(payload,action)(state) ));
 
-function buildMutations({mutations = {}, subduxes = {}}) {
+function buildMutations({mutations = {}, subduxes= {}}: any) {
   // we have to differentiate the subduxes with '*' than those
   // without, as the root '*' is not the same as any sub-'*'
 
     const actions = fp.uniq( Object.keys(mutations).concat(
-        ...Object.values( subduxes ).map( ({mutations = {}}) => Object.keys(mutations) )
+        ...Object.values( subduxes ).map( ({mutations = {}}:any) => Object.keys(mutations) )
     ) );
 
     let mergedMutations = {};
 
     let [ globby, nonGlobby ] = fp.partition(
-        ([_,{mutations={}}]) => mutations['*'],
+        ([_,{mutations={}}]:any) => mutations['*'],
         Object.entries(subduxes)
     );
 
@@ -71,16 +71,16 @@ function buildMutations({mutations = {}, subduxes = {}}) {
         ])(globby);
 
     const globbyMutation = (payload,action) => u(
-        fp.mapValues( mut => mut(payload,action) )(globby)
+        fp.mapValues( (mut:any) => mut(payload,action) )(globby)
     );
 
     actions.forEach( action => {
         mergedMutations[action] = [ globbyMutation ]
     });
 
-    nonGlobby.forEach( ([slice, {mutations={},reducer={}}]) => {
+    nonGlobby.forEach( ([slice, {mutations={},reducer={}}]:any) => {
         Object.entries(mutations).forEach(([type,mutation]) => {
-            const localized = (payload=null,action={}) => u.updateIn( slice, mutation(payload,action) );
+            const localized = (payload=null,action={}) => u.updateIn( slice )( (mutation as any)(payload,action) );
 
             mergedMutations[type].push(localized);
         })
@@ -95,47 +95,55 @@ function buildMutations({mutations = {}, subduxes = {}}) {
 }
 
 function updux(config) {
-  const dux = {};
+  const actions = buildActions(config);
 
-  dux.actions = buildActions(config);
+  const initial = buildInitial(config);
 
-  dux.initial = buildInitial(config);
+  const mutations = buildMutations(config);
 
-  dux.mutations = buildMutations(config);
-
-  dux.upreducer = (action={}) => state => {
-    if (state === null) state = dux.initial;
+  const upreducer = (action={}) => state => {
+    if (state === null) state = initial;
 
     const a =
-      dux.mutations[action.type] ||
-      dux.mutations['*'] ||
+      mutations[(action as any).type] ||
+      mutations['*'] ||
       (() => state => state);
 
-    return a(action.payload, action)(state);
+    return a((action as any).payload, action)(state);
   };
 
-  dux.reducer = (state, action) => {
-    return dux.upreducer(action)(state);
+  const reducer = (state, action) => {
+    return upreducer(action)(state);
   };
 
-  dux.middleware = buildMiddleware(config,dux);
+  const middleware = buildMiddleware(
+      config.effects,
+      actions,
+      config.subduxes,
+  );
 
-  dux.createStore = () => {
-      const store =  createStore( dux.reducer, dux.initial,
-          applyMiddleware( dux.middleware)
+  const createStore = () => {
+      const store =  reduxCreateStore( reducer, initial,
+          applyMiddleware( middleware)
         );
-      for ( let a in dux.actions ) {
+      for ( let a in actions ) {
           store.dispatch[a] = (...args) => {
-              store.dispatch(dux.actions[a](...args))
+              store.dispatch(actions[a](...args))
           };
       }
 
       return store;
   }
 
-
-
-  return dux;
+  return {
+      reducer,
+      upreducer,
+      middleware,
+      createStore,
+      actions,
+      mutations,
+      initial,
+  };
 }
 
 export default updux;

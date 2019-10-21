@@ -1,0 +1,8 @@
+{
+    "theme": "minimal",
+    "tsBuildInfoFile": true,
+    "out": "docs",
+    "mode": "file",
+    "excludePrivate": true,
+    "excludeNotExported": false
+}
