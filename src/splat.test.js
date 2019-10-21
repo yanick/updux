@@ -35,7 +35,7 @@ test( 'with subduxes', () => {
             bar: updux({
                 mutations: {
                     foo: () => tracer('d'),
-                    '*': (dummy,a) => { console.log( "got a ", dummy, a ); return tracer('e') },
+                    '*': (dummy,a) => tracer('e'),
                 },
             }),
         },

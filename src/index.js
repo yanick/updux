@@ -62,12 +62,16 @@ function buildMutations({mutations = {}, subduxes = {}}) {
         Object.entries(subduxes)
     );
 
-    globby = globby |> fp.fromPairs |> fp.mapValues(
+    globby =
+        fp.flow([
+            fp.fromPairs,
+            fp.mapValues(
         ({reducer}) => (_,action={}) => state =>
-            reducer(state,action) );
+            reducer(state,action) ),
+        ])(globby);
 
     const globbyMutation = (payload,action) => u(
-        globby |> fp.mapValues( mut => mut(payload,action) )
+        fp.mapValues( mut => mut(payload,action) )(globby)
     );
 
     actions.forEach( action => {
@@ -86,7 +90,7 @@ function buildMutations({mutations = {}, subduxes = {}}) {
             mergedMutations[type].push(mutation);
     });
 
-    return mergedMutations |> fp.mapValues( composeMutations );
+    return fp.mapValues( composeMutations )(mergedMutations);
 
 }
 
