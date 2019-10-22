@@ -3,7 +3,7 @@ import buildActions from './buildActions';
 import buildInitial from './buildInitial';
 import buildMutations from './buildMutations';
 
-import { Dictionary, Mutation } from './types';
+import { Dictionary, Mutation, ActionCreators } from './types';
 import buildCreateStore from './buildCreateStore';
 import buildMiddleware from './buildMiddleware';
 import buildUpreducer from './buildUpreducer';
@@ -18,7 +18,7 @@ type UpduxConfig = {
 };
 
 export class Updux {
-    actions: any;
+    actions: ActionCreators;
 
     subduxes: Dictionary<Updux>;
 
