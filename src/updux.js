@@ -17,10 +17,10 @@ export class Updux {
 
 
         this.actions = buildActions(
+            config.actions,
             config.mutations,
             config.effects,
-            fp.mergeAll( Object.values( this.subduxes ).map( ({ actions }) =>
-                actions ) )
+            Object.values( this.subduxes ).map( ({actions}) => actions ),
         )
 
         this.initial = buildInitial(
