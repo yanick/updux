@@ -12,6 +12,6 @@ export default function buildCreateStore( reducer, initial, middleware,
           };
       }
 
-      return store as any;
+      return store;
   }
 };

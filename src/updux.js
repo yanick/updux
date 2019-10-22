@@ -3,42 +3,17 @@ import buildActions from './buildActions';
 import buildInitial from './buildInitial';
 import buildMutations from './buildMutations';
 
-import { Dictionary, Mutation, ActionCreators } from './types';
 import buildCreateStore from './buildCreateStore';
 import buildMiddleware from './buildMiddleware';
 import buildUpreducer from './buildUpreducer';
 
-type UpduxConfig = {
-    initial?: any,
-    mutations?: any,
-    effects?: any,
-    subduxes?: {
-        [ slice: string ]: UpduxConfig | Updux
-    }
-};
-
 export class Updux {
-    actions: ActionCreators;
 
-    subduxes: Dictionary<Updux>;
-
-    initial: any;
-
-    mutations: Dictionary<Mutation>;
-
-    createStore: Function;
-
-    upreducer: (action:any)=>(state:any)=>any;
-
-    reducer: <S>(state:S,action:any) => S;
-
-    middleware: (api:any) => (next: Function) => (action: any) => any;
-
-    constructor(config: UpduxConfig) {
+    constructor(config) {
 
         this.subduxes = fp.mapValues(
-            value => fp.isPlainObject(value) ? new Updux(value as UpduxConfig) : value )(fp.getOr({},'subduxes',config)
-        ) as Dictionary<Updux>;
+            value => fp.isPlainObject(value) ? new Updux(value ) : value )(fp.getOr({},'subduxes',config)
+        );
 
 
         this.actions = buildActions(

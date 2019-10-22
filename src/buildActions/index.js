@@ -1,16 +1,15 @@
 import fp from 'lodash/fp';
-import { ActionEffects, ActionCreator, ActionCreators, ActionMutations } from '../types';
 
-function actionFor(type: string) {
+function actionFor(type) {
   return ( (payload = undefined, meta = undefined) =>
     fp.pickBy(v => v !== null)({type, payload, meta})
-  ) as ActionCreator;
+  );
 }
 
 export default function buildActions(
-  mutations : ActionMutations = {},
-  effects : ActionEffects = {},
-  subActions : ActionCreators = {},
+  mutations = {},
+  effects = {},
+  subActions = {},
 ) {
 
   return { ...subActions,
