@@ -1,22 +1,35 @@
 {
-   "dependencies" : {
-      "lodash" : "^4.17.15",
-      "redux" : "^4.0.4"
+   "dependencies": {
+      "lodash": "^4.17.15",
+      "redux": "^4.0.4"
    },
-   "devDependencies" : {
-      "@babel/core" : "^7.6.4",
-      "@babel/preset-env" : "^7.6.3",
-      "babel-jest" : "^24.9.0",
-      "jest" : "^24.9.0",
-      "updeep" : "^1.2.0"
+   "devDependencies": {
+      "@babel/cli": "^7.6.4",
+      "@babel/core": "^7.6.4",
+      "@babel/preset-env": "^7.6.3",
+      "babel-jest": "^24.9.0",
+      "jest": "^24.9.0",
+      "updeep": "^1.2.0"
    },
-   "license" : "MIT",
-   "main" : "dist/index.js",
-   "name" : "updux",
-   "scripts" : {
-      "build" : "tsc",
+   "license": "MIT",
+   "main": "dist/index.js",
+   "name": "updux",
+   "description": "Updeep-friendly Redux helper framework",
+   "scripts": {
+      "build": "babel src --out-dir dist",
       "test": "jest"
    },
-   "types" : "dist/index.d.ts",
-   "version" : "0.0.1"
+   "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yanick/updux.git"
+  },
+  "keywords": [
+    "redux", "updeep"
+  ],
+  "author": "Yanick Champoux <yanick@babyl.ca> (http://techblog.babyl.ca)",
+  "bugs": {
+    "url": "https://github.com/yanick/updux/issues"
+  },
+  "homepage": "https://github.com/yanick/updux#readme"
 }
