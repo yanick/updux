@@ -1,11 +1,8 @@
 import fp from 'lodash/fp';
 
-export default function buildInitial(initial : any = {}, subduxes = {}) {
-  let state = initial;
-
-  if (fp.isPlainObject(initial)) {
-    initial = fp.mergeAll([ subduxes, initial, ]);
-  }
-
-  return initial;
+export default function buildInitial<S = any>(
+  initial: any = {},
+  subduxes = {},
+): S {
+  return fp.isPlainObject(initial) ? fp.mergeAll([subduxes, initial]) : initial;
 }
