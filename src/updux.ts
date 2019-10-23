@@ -6,11 +6,14 @@ import buildMutations from './buildMutations';
 import buildCreateStore from './buildCreateStore';
 import buildMiddleware from './buildMiddleware';
 import buildUpreducer from './buildUpreducer';
-import { UpduxConfig, Dictionary } from './types';
+import { UpduxConfig, Dictionary, Action, ActionCreator } from './types';
+
 
 export class Updux {
 
     subduxes: Dictionary<Updux>;
+
+    actions: Dictionary<ActionCreator>
 
     constructor(config: UpduxConfig) {
 
