@@ -1,8 +1,14 @@
 import fp from 'lodash/fp';
+import { Action } from '../types';
 
-function actionFor(type) {
-  const creator = ( (payload = undefined, meta = undefined) =>
-    fp.pickBy(v => v !== undefined)({type, payload, meta})
+interface ActionCreator {
+    ( ...args: any[] ): Action;
+    _genericAction?: boolean
+}
+
+function actionFor(type:string) {
+  const creator : ActionCreator = ( (payload = undefined, meta = undefined) =>
+    fp.pickBy(v => v !== undefined)({type, payload, meta}) as Action
   );
 
   creator._genericAction = true;
@@ -11,7 +17,7 @@ function actionFor(type) {
 }
 
 export default function buildActions(
-  creators = {},
+  creators : { [action: string]: Function } = {},
   mutations = {},
   effects = {},
   subActions = [],
@@ -31,7 +37,7 @@ export default function buildActions(
         ...generic,
         ...crafted,
         ...Object.entries(creators).map(
-            ([type, payload]) => [type, (...args) => ({ type, payload: payload(...args) })]
+            ([type, payload]: [ string, Function ]) => [type, (...args: any) => ({ type, payload: payload(...args) })]
         ),
     ];
 

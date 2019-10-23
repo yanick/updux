@@ -1,9 +1,9 @@
 import fp from 'lodash/fp';
 
-import { Dictionary, Mutation, UpduxAction } from '../types';
+import { Dictionary, Mutation, Action } from '../types';
 
 function buildUpreducer<S>(initial: S, mutations: Dictionary<Mutation<S>> ) {
-  return (action :UpduxAction) => (state: S) => {
+  return (action :Action) => (state: S) => {
     if (state === null) state = initial;
 
     const a =

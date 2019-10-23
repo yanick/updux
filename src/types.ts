@@ -1,9 +1,9 @@
-import { Action } from 'redux';
 
-export type UpduxAction = Action & Partial<{
-    payload: any,
-    meta: any,
-}>
+export type Action = {
+    type: string,
+    payload?: any,
+    meta?: any,
+}
 
 export type Dictionary<T> = { [key: string]: T };
 
