@@ -6,14 +6,27 @@ import buildMutations from './buildMutations';
 import buildCreateStore from './buildCreateStore';
 import buildMiddleware from './buildMiddleware';
 import buildUpreducer from './buildUpreducer';
-import { UpduxConfig, Dictionary, Action, ActionCreator } from './types';
+import { UpduxConfig, Dictionary, Action, ActionCreator, Mutation, Upreducer } from './types';
 
+import { Middleware } from 'redux';
 
-export class Updux {
+export class Updux<S=any> {
 
     subduxes: Dictionary<Updux>;
 
     actions: Dictionary<ActionCreator>
+
+    initial: S;
+
+    mutations: Dictionary<Mutation>;
+
+    upreducer: Upreducer<S>;
+
+    reducer: (state:S|undefined,action:Action) => S;
+
+    middleware: Middleware;
+
+    createStore: Function;
 
     constructor(config: UpduxConfig) {
 
@@ -24,12 +37,11 @@ export class Updux {
 
         this.actions = buildActions(
             config.actions,
-            config.mutations,
-            config.effects,
-            Object.values( this.subduxes ).map( ({actions}) => actions ),
+            [ ...Object.keys(config.mutations||{}), ...Object.keys(config.effects||{} ) ],
+            fp.flatten( Object.values( this.subduxes ).map( ({actions}:Updux) => Object.entries(actions) ) ),
         )
 
-        this.initial = buildInitial(
+        this.initial = buildInitial<any>(
             config.initial, fp.mapValues( ({initial}) => initial )(this.subduxes)
         );
 
@@ -42,16 +54,16 @@ export class Updux {
         );
 
         this.reducer = (state,action) => {
-            return this.upreducer(action)(state);
+            return this.upreducer(action)(state as S);
         }
 
         this.middleware = buildMiddleware(
             config.effects,
             this.actions,
-            config.subduxes,
+            Object.values(this.subduxes).map( sd => sd.middleware )
         );
 
-        this.createStore = buildCreateStore(this.reducer,this.initial,this.middleware,this.actions);
+        this.createStore = buildCreateStore<S>(this.reducer,this.initial,this.middleware,this.actions);
     }
 
 }

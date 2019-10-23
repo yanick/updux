@@ -12,14 +12,9 @@ const MiddlewareFor = (type: any, mw: Middleware ): Middleware => api => next =>
 type Next = (action: Action) => any;
 
 function buildMiddleware(
-    effects: Dictionary<Middleware>,
-    actions: Dictionary<ActionCreator>,
-    subMiddlewares: Middleware[],
-): Middleware
-function buildMiddleware(
-    effects = {},
-    actions = {},
-    subduxes = {},
+    effects : Dictionary<Middleware>= {},
+    actions : Dictionary<ActionCreator>= {},
+    subMiddlewares :Middleware[] = [],
 ) {
   return (api: any) => {
     for (let type in actions) {
@@ -31,7 +26,7 @@ function buildMiddleware(
         ...fp.toPairs(effects).map(([type, effect]) =>
             MiddlewareFor(type,effect as Middleware)
         ),
-        ...fp.map('middleware', subduxes),
+        ...subMiddlewares
       ]
         .filter(x => x)
         .reduceRight((next, mw) => mw(api)(next), original_next);

@@ -1,5 +1,5 @@
 import fp from 'lodash/fp';
-import { Action } from '../types';
+import { Action, ActionPayloadGenerator, Dictionary } from '../types';
 
 interface ActionCreator {
     ( ...args: any[] ): Action;
@@ -16,27 +16,25 @@ function actionFor(type:string) {
   return creator;
 }
 
-export default function buildActions(
-  creators : { [action: string]: Function } = {},
-  mutations = {},
-  effects = {},
-  subActions = [],
-) {
+type ActionPair = [ string, ActionCreator ];
+
+function buildActions(
+  generators : Dictionary<ActionPayloadGenerator> = {},
+  actionNames: string[] = [],
+  subActions : ActionPair[] = [],
+):Dictionary<ActionCreator> {
 
     // priority => generics => generic subs => craft subs => creators
 
   const [ crafted, generic ] = fp.partition(
       ([type,f]) => !f._genericAction
-  )(  fp.flatten( subActions.map( x => Object.entries(x) ) ).filter(
-      ([_,f]) => f
-  ) )
+  )( subActions );
 
     const actions = [
-        ...([ ...Object.keys(mutations), ...Object.keys(effects) ]
-            .map( type => [ type, actionFor(type) ] )),
+        ...(actionNames.map( type => [ type, actionFor(type) ] )),
         ...generic,
         ...crafted,
-        ...Object.entries(creators).map(
+        ...Object.entries(generators).map(
             ([type, payload]: [ string, Function ]) => [type, (...args: any) => ({ type, payload: payload(...args) })]
         ),
     ];
@@ -44,3 +42,5 @@ export default function buildActions(
     return fp.fromPairs(actions);
 
 }
+
+export default buildActions;
