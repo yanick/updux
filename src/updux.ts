@@ -6,14 +6,17 @@ import buildMutations from './buildMutations';
 import buildCreateStore from './buildCreateStore';
 import buildMiddleware from './buildMiddleware';
 import buildUpreducer from './buildUpreducer';
+import { UpduxConfig, Dictionary } from './types';
 
 export class Updux {
 
-    constructor(config) {
+    subduxes: Dictionary<Updux>;
+
+    constructor(config: UpduxConfig) {
 
         this.subduxes = fp.mapValues(
-            value => fp.isPlainObject(value) ? new Updux(value ) : value )(fp.getOr({},'subduxes',config)
-        );
+            (value:UpduxConfig|Updux) => fp.isPlainObject(value) ? new Updux(value) : value )(fp.getOr({},'subduxes',config)
+        ) as Dictionary<Updux>;
 
 
         this.actions = buildActions(
