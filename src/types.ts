@@ -1,3 +1,4 @@
+import { Middleware } from 'redux';
 
 export type Action = {
     type: string,
@@ -20,7 +21,7 @@ export type UpduxConfig<S=any> = Partial<{
         [ type: string ]: ActionPayloadGenerator
     },
     mutations: any,
-    effects: any,
+    effects: Dictionary<Middleware>,
 }>;
 
 export type Upreducer<S=any> = (action:Action) => (state:S) => S;

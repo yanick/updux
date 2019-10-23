@@ -7,7 +7,7 @@ test( 'simple effect', () => {
 
     const store = updux({
         effects: {
-            foo: api => next => action => {
+            foo: (api:any) => (next:any) => (action:any) => {
                 tracer();
                 next(action);
             },
@@ -30,7 +30,7 @@ test( 'effect and sub-effect', () => {
 
     const tracer = jest.fn();
 
-    const tracerEffect = signature => api => next => action => {
+    const tracerEffect = ( signature: string ) => ( api:any ) => (next:any) => ( action: any ) => {
         tracer(signature);
         next(action);
     };
@@ -83,7 +83,7 @@ test( '"*" effect', () => {
 
 test( 'async effect', async () => {
 
-    function timeout(ms) {
+    function timeout(ms:number) {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
