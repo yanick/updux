@@ -1,14 +1,11 @@
 "use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = buildInitial;
-
-var _fp = _interopRequireDefault(require("lodash/fp"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const fp_1 = __importDefault(require("lodash/fp"));
 function buildInitial(initial = {}, subduxes = {}) {
-  return _fp.default.isPlainObject(initial) ? _fp.default.mergeAll([subduxes, initial]) : initial;
+    return fp_1.default.isPlainObject(initial) ? fp_1.default.mergeAll([subduxes, initial]) : initial;
 }
+exports.default = buildInitial;
+//# sourceMappingURL=index.js.map

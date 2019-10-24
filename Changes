@@ -1,5 +1,8 @@
 # Revision history for Updux
 
+0.2.0 2019-10-24
+    - Converted everything to Typescript.
+
 0.1.0 2019-10-22
     - Add 'actions' in the config.
 

@@ -1,18 +1,11 @@
 "use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = updux;
-
-var _fp = _interopRequireDefault(require("lodash/fp"));
-
-var _updeep = _interopRequireDefault(require("updeep"));
-
-var _updux = _interopRequireDefault(require("./updux"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const updux_1 = __importDefault(require("./updux"));
 function updux(config) {
-  return new _updux.default(config);
+    return new updux_1.default(config);
 }
+exports.default = updux;
+//# sourceMappingURL=index.js.map
