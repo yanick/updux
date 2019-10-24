@@ -1,7 +1,7 @@
 
 # What's Updux?
 
-So, I'm a fan of [Redux][]. Two days ago I discovered
+So, I'm a fan of [Redux](https://redux.js.org). Two days ago I discovered
 [rematch](https://rematch.github.io/rematch) alonside a few other frameworks built atop Redux. 
 
 It has a couple of pretty good ideas that removes some of the 
@@ -11,10 +11,10 @@ actions from the said mutations and effects? Genius!
 
 But it also enforces a flat hierarchy of reducers -- where
 is the fun in that? And I'm also having a strong love for
-[Updeep][], so I want reducer state updates to leverage the heck out of it.
+[Updeep](https://github.com/substantial/updeep), so I want reducer state updates to leverage the heck out of it.
 
 All that to say, I had some fun yesterday and hacked a proto-lovechild
-of `Rematch` and `Updeep`, with a dash of [VueX][] inspiration. 
+of `Rematch` and `Updeep`, with a dash of [VueX](https://vuex.vuejs.org/) inspiration. 
 I call it... `Updux`.
 
 # Synopsis
@@ -107,6 +107,7 @@ const rootUpdux = updux({
         todos, statistics
     }
 });
+```
 
 #### mutations
 
@@ -189,6 +190,7 @@ updux({
         }
     }
 });
+```
 
 ### actions
 
@@ -208,7 +210,7 @@ const { actions } = updox({
 
 actions.foo({ x: 1, y: 2 }); // => { type: foo, payload: { x:1, y:2  } }
 actions.bar(1,2);            // => { type: bar, payload: { x:1, y:2  } }
-
+```
 
 ## return value
 
@@ -382,7 +384,3 @@ battle.dispatch.play_game();
 ....
 ```
 
-
-[Redux]: https://redux.js.org
-[Updeep]: https://github.com/substantial/updeep
-[VueX]: https://vuex.vuejs.org/
