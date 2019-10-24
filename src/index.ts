@@ -3,6 +3,8 @@ import u from 'updeep';
 
 import Updux from './updux';
 
-export default function updux(config) {
+import { UpduxConfig } from './types';
+
+export default function updux(config: UpduxConfig) {
   return new Updux(config);
 }

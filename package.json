@@ -7,8 +7,13 @@
       "@babel/cli": "^7.6.4",
       "@babel/core": "^7.6.4",
       "@babel/preset-env": "^7.6.3",
+      "@types/jest": "^24.0.19",
+      "@types/lodash": "^4.14.144",
       "babel-jest": "^24.9.0",
       "jest": "^24.9.0",
+      "ts-jest": "^24.1.0",
+      "tsd": "^0.10.0",
+      "typescript": "^3.6.4",
       "updeep": "^1.2.0"
    },
    "license": "MIT",
@@ -20,16 +25,18 @@
       "test": "jest"
    },
    "version": "0.1.0",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/yanick/updux.git"
-  },
-  "keywords": [
-    "redux", "updeep"
-  ],
-  "author": "Yanick Champoux <yanick@babyl.ca> (http://techblog.babyl.ca)",
-  "bugs": {
-    "url": "https://github.com/yanick/updux/issues"
-  },
-  "homepage": "https://github.com/yanick/updux#readme"
+   "repository": {
+      "type": "git",
+      "url": "git+https://github.com/yanick/updux.git"
+   },
+   "keywords": [
+      "redux",
+      "updeep"
+   ],
+   "author": "Yanick Champoux <yanick@babyl.ca> (http://techblog.babyl.ca)",
+   "bugs": {
+      "url": "https://github.com/yanick/updux/issues"
+   },
+   "homepage": "https://github.com/yanick/updux#readme",
+   "types": "./index.d.ts"
 }
