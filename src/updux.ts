@@ -6,9 +6,13 @@ import buildMutations from './buildMutations';
 import buildCreateStore from './buildCreateStore';
 import buildMiddleware from './buildMiddleware';
 import buildUpreducer from './buildUpreducer';
-import { UpduxConfig, Dictionary, Action, ActionCreator, Mutation, Upreducer } from './types';
+import { UpduxConfig, Dictionary, Action, ActionCreator, Mutation, Upreducer, UpduxDispatch } from './types';
 
-import { Middleware } from 'redux';
+import { Middleware, Store } from 'redux';
+
+type StoreWithDispatchActions<S=any,Actions={ [action: string]: (...args:any) => Action }> = Store<S> & {
+    dispatch: { [ type in keyof Actions ]: (...args:any) => void }
+};
 
 export class Updux<S=any> {
 
@@ -24,9 +28,9 @@ export class Updux<S=any> {
 
     reducer: (state:S|undefined,action:Action) => S;
 
-    middleware: Middleware;
+    middleware: Middleware<{},S,UpduxDispatch>;
 
-    createStore: Function;
+    createStore: () => StoreWithDispatchActions<S>;
 
     constructor(config: UpduxConfig) {
 
@@ -63,7 +67,9 @@ export class Updux<S=any> {
             Object.values(this.subduxes).map( sd => sd.middleware )
         );
 
-        this.createStore = buildCreateStore<S>(this.reducer,this.initial,this.middleware,this.actions);
+        const actions = this.actions;
+        this.createStore = buildCreateStore<S>(this.reducer,this.initial,this.middleware as Middleware,this.actions) as
+        () => StoreWithDispatchActions< S, typeof actions  >;
     }
 
 }

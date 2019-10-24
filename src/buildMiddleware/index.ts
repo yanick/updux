@@ -1,7 +1,7 @@
 import fp from 'lodash/fp';
 
-import { Middleware } from 'redux';
-import { Dictionary, ActionCreator, Action } from '../types';
+import { Middleware, MiddlewareAPI, Dispatch } from 'redux';
+import { Dictionary, ActionCreator, Action, UpduxDispatch } from '../types';
 
 const MiddlewareFor = (type: any, mw: Middleware ): Middleware => api => next => action => {
     if (type !== '*' && action.type !== type) return next(action);
@@ -11,12 +11,13 @@ const MiddlewareFor = (type: any, mw: Middleware ): Middleware => api => next =>
 
 type Next = (action: Action) => any;
 
-function buildMiddleware(
-    effects : Dictionary<Middleware>= {},
+function buildMiddleware<S=any>(
+    effects : Dictionary<Middleware<{},S,UpduxDispatch>>= {},
     actions : Dictionary<ActionCreator>= {},
-    subMiddlewares :Middleware[] = [],
-) {
-  return (api: any) => {
+    subMiddlewares :Middleware<{},S,UpduxDispatch>[] = [],
+): Middleware<{},S,UpduxDispatch>
+ {
+  return (api: MiddlewareAPI<UpduxDispatch,S>) => {
     for (let type in actions) {
       api.dispatch[type] = (...args:any[]) => api.dispatch(((actions as any)[type] as any)(...args));
     }
