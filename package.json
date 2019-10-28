@@ -38,5 +38,5 @@
       "url": "https://github.com/yanick/updux/issues"
    },
    "homepage": "https://github.com/yanick/updux#readme",
-   "types": "./index.d.ts"
+   "types": "./dist/index.d.ts"
 }
