@@ -1,5 +1,9 @@
 # Revision history for Updux
 
+NEXT
+    - point types to right file.
+    - add state to updux type.
+
 0.2.0 2019-10-24
     - Converted everything to Typescript.
 
