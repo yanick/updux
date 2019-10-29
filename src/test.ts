@@ -28,7 +28,7 @@ test('reducer', () => {
     },
   });
 
-  let state = reducer(null, {type:'noop'});
+  let state = reducer(undefined, {type:'noop'});
 
   expect(state).toEqual({counter: 1});
 
@@ -116,7 +116,7 @@ test('precedence between root and sub-reducers', () => {
         foo: { bar: 4, quux: 3 }
     });
 
-    expect( reducer(null,actions.inc() ) ).toEqual({
+    expect( reducer(undefined,actions.inc() ) ).toEqual({
         foo: { bar: 5, quux: 3 }, surprise: 5
     });
 
