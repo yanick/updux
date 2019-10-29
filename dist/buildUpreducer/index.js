@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 function buildUpreducer(initial, mutations) {
     return (action) => (state) => {
-        if (state === null)
+        if (state === undefined)
             state = initial;
         const a = mutations[action.type] ||
             mutations['*'];

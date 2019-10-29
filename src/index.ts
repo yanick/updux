@@ -5,6 +5,6 @@ import Updux from './updux';
 
 import { UpduxConfig } from './types';
 
-export default function updux(config: UpduxConfig) {
-  return new Updux(config);
+export default function updux<S=any>(config: UpduxConfig<S>) {
+  return new Updux<S>(config);
 }
