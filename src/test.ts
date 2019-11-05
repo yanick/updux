@@ -1,9 +1,9 @@
-import updux from '.';
+import Updux from '.';
 
 test('actions from mutations', () => {
   const {
     actions: {foo, bar},
-  } = updux({
+  } = new Updux({
     mutations: {
       foo: () => (x:any) => x,
     },
@@ -21,7 +21,7 @@ test('actions from mutations', () => {
 });
 
 test('reducer', () => {
-  const {actions, reducer} = updux({
+  const {actions, reducer} = new Updux({
     initial: {counter: 1},
     mutations: {
       inc: () => ({counter}:{counter:number}) => ({counter: counter + 1}),
@@ -38,7 +38,7 @@ test('reducer', () => {
 });
 
 test( 'sub reducers', () => {
-    const foo = updux({
+    const foo = new Updux({
         initial: 1,
         mutations: {
             doFoo: () => (x:number) => x + 1,
@@ -46,7 +46,7 @@ test( 'sub reducers', () => {
         },
     });
 
-    const bar = updux({
+    const bar = new Updux({
         initial: 'a',
         mutations: {
             doBar: () => (x:string) => x + 'a',
@@ -54,7 +54,7 @@ test( 'sub reducers', () => {
         }
     });
 
-    const { initial, actions, reducer } = updux({
+    const { initial, actions, reducer } = new Updux({
         subduxes: {
             foo, bar
         }
@@ -87,7 +87,7 @@ test('precedence between root and sub-reducers', () => {
         initial,
         reducer,
         actions,
-    } = updux({
+    } = new Updux({
         initial: {
             foo: { bar: 4 },
         },
@@ -100,7 +100,7 @@ test('precedence between root and sub-reducers', () => {
             }
         },
         subduxes: {
-            foo: updux({
+            foo: {
                 initial: {
                     bar: 2,
                     quux: 3,
@@ -108,7 +108,7 @@ test('precedence between root and sub-reducers', () => {
                 mutations: {
                     inc: () => (state:any) => ({...state, bar: state.bar + 1 })
                 },
-            }),
+            },
         }
     });
 
@@ -130,7 +130,7 @@ test( 'middleware', async () => {
     const {
         middleware,
         createStore
-    } = updux({
+    } = new Updux({
         initial: "",
         mutations: {
             inc: (addition:number) => (state:number) => state + addition,
@@ -147,14 +147,14 @@ test( 'middleware', async () => {
             }
         },
         subduxes: {
-            foo: updux({
+            foo: {
                 effects: {
-                    doEeet: (api) => next => action => {
+                    doEeet: (api:any) => ( next:any ) => ( action: any ) => {
                         api.dispatch({ type: 'inc', payload: 'b'});
                         next(action);
                     }
                 }
-            }),
+            },
         }
     });
 
@@ -167,5 +167,29 @@ test( 'middleware', async () => {
     await timeout(1000);
 
     expect(store.getState()).toEqual( 'abZc' );
+
+});
+
+
+test( "subduxes and mutations", () => {
+    const foo = new Updux({ mutations: {
+        quux: () => () => 'x',
+        blart: () => () => 'a',
+    }});
+    const bar = new Updux({ mutations: {
+        quux: () => () => 'y'
+    }});
+    const baz = new Updux({
+        mutations: {
+        quux: () => (state:any) => ({...state, "baz": "z" })
+    }, subduxes: { foo, bar } });
+
+    let state = baz.reducer(undefined, baz.actions.quux() );
+
+    expect(state).toEqual({
+        foo: "x",
+        bar: "y",
+        baz: "z",
+    });
 
 });

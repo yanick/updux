@@ -12,7 +12,8 @@ const MiddlewareFor = (type, mw) => api => next => action => {
 function buildMiddleware(effects = {}, actions = {}, subMiddlewares = []) {
     return (api) => {
         for (let type in actions) {
-            api.dispatch[type] = (...args) => api.dispatch(actions[type](...args));
+            const ac = actions[type];
+            api.dispatch[type] = (...args) => api.dispatch(ac(...args));
         }
         return (original_next) => {
             return [

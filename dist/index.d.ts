@@ -1,4 +1,5 @@
 import Updux from './updux';
-import { UpduxConfig } from './types';
-export default function updux<S = any>(config: UpduxConfig<S>): Updux<S>;
+export { default as Updux } from './updux';
+export { UpduxConfig } from './types';
+export default Updux;
 //# sourceMappingURL=index.d.ts.map

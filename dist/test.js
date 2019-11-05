@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const _1 = __importDefault(require("."));
 test('actions from mutations', () => {
-    const { actions: { foo, bar }, } = _1.default({
+    const { actions: { foo, bar }, } = new _1.default({
         mutations: {
             foo: () => (x) => x,
         },
@@ -19,7 +19,7 @@ test('actions from mutations', () => {
     });
 });
 test('reducer', () => {
-    const { actions, reducer } = _1.default({
+    const { actions, reducer } = new _1.default({
         initial: { counter: 1 },
         mutations: {
             inc: () => ({ counter }) => ({ counter: counter + 1 }),
@@ -31,21 +31,21 @@ test('reducer', () => {
     expect(state).toEqual({ counter: 2 });
 });
 test('sub reducers', () => {
-    const foo = _1.default({
+    const foo = new _1.default({
         initial: 1,
         mutations: {
             doFoo: () => (x) => x + 1,
             doAll: () => (x) => x + 10,
         },
     });
-    const bar = _1.default({
+    const bar = new _1.default({
         initial: 'a',
         mutations: {
             doBar: () => (x) => x + 'a',
             doAll: () => (x) => x + 'b',
         }
     });
-    const { initial, actions, reducer } = _1.default({
+    const { initial, actions, reducer } = new _1.default({
         subduxes: {
             foo, bar
         }
@@ -62,7 +62,7 @@ test('sub reducers', () => {
     expect(state).toEqual({ foo: 12, bar: 'aab' });
 });
 test('precedence between root and sub-reducers', () => {
-    const { initial, reducer, actions, } = _1.default({
+    const { initial, reducer, actions, } = new _1.default({
         initial: {
             foo: { bar: 4 },
         },
@@ -75,7 +75,7 @@ test('precedence between root and sub-reducers', () => {
             }
         },
         subduxes: {
-            foo: _1.default({
+            foo: {
                 initial: {
                     bar: 2,
                     quux: 3,
@@ -83,7 +83,7 @@ test('precedence between root and sub-reducers', () => {
                 mutations: {
                     inc: () => (state) => ({ ...state, bar: state.bar + 1 })
                 },
-            }),
+            },
         }
     });
     expect(initial).toEqual({
@@ -97,7 +97,7 @@ function timeout(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 test('middleware', async () => {
-    const { middleware, createStore } = _1.default({
+    const { middleware, createStore } = new _1.default({
         initial: "",
         mutations: {
             inc: (addition) => (state) => state + addition,
@@ -114,14 +114,14 @@ test('middleware', async () => {
             }
         },
         subduxes: {
-            foo: _1.default({
+            foo: {
                 effects: {
-                    doEeet: (api) => next => action => {
+                    doEeet: (api) => (next) => (action) => {
                         api.dispatch({ type: 'inc', payload: 'b' });
                         next(action);
                     }
                 }
-            }),
+            },
         }
     });
     const store = createStore();
@@ -129,5 +129,25 @@ test('middleware', async () => {
     expect(store.getState()).toEqual('abZ');
     await timeout(1000);
     expect(store.getState()).toEqual('abZc');
+});
+test("subduxes and mutations", () => {
+    const foo = new _1.default({ mutations: {
+            quux: () => () => 'x',
+            blart: () => () => 'a',
+        } });
+    const bar = new _1.default({ mutations: {
+            quux: () => () => 'y'
+        } });
+    const baz = new _1.default({
+        mutations: {
+            quux: () => (state) => ({ ...state, "baz": "z" })
+        }, subduxes: { foo, bar }
+    });
+    let state = baz.reducer(undefined, baz.actions.quux());
+    expect(state).toEqual({
+        foo: "x",
+        bar: "y",
+        baz: "z",
+    });
 });
 //# sourceMappingURL=test.js.map

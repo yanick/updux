@@ -1,0 +1,7 @@
+[ ] Warn if one tries to define the same action twice
+[ ] Middleware of subduxes get sub-states and getRootState
+[ ] add `addAction` method
+[ ] can do .addMutation( 'foo', ... );, which either
+        use the action already existing or create a boring one (should I?)
+
+

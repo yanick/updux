@@ -1,18 +1,18 @@
-import updux from '.';
+import Updux from '.';
 import u from 'updeep';
 
 test( 'simple effect', () => {
 
     const tracer = jest.fn();
 
-    const store = updux({
+    const store = (new Updux({
         effects: {
             foo: (api:any) => (next:any) => (action:any) => {
                 tracer();
                 next(action);
             },
         },
-    }).createStore();
+    })).createStore();
 
     expect(tracer).not.toHaveBeenCalled();
 
@@ -35,16 +35,17 @@ test( 'effect and sub-effect', () => {
         next(action);
     };
 
-    const store = updux({
+    const store = (new Updux({
         effects: {
             foo: tracerEffect('root'),
         },
         subduxes: {
-            zzz: updux({effects: {
+            zzz: {effects: {
                 foo: tracerEffect('child'),
-            }})
+            }
+            }
         },
-    }).createStore();
+    })).createStore();
 
     expect(tracer).not.toHaveBeenCalled();
 
@@ -57,22 +58,20 @@ test( 'effect and sub-effect', () => {
     expect(tracer).toHaveBeenNthCalledWith(1,'root');
     expect(tracer).toHaveBeenNthCalledWith(2,'child');
 
-
-
 });
 
 test( '"*" effect', () => {
 
     const tracer = jest.fn();
 
-    const store = updux({
+    const store = (new Updux({
         effects: {
             '*': api => next => action => {
                 tracer();
                 next(action);
             },
         },
-    }).createStore();
+    })).createStore();
 
     expect(tracer).not.toHaveBeenCalled();
 
@@ -89,7 +88,7 @@ test( 'async effect', async () => {
 
     const tracer = jest.fn();
 
-    const store = updux({
+    const store = (new Updux({
         effects: {
             foo: api => next => async action => {
                 next(action);
@@ -97,7 +96,7 @@ test( 'async effect', async () => {
                 tracer();
             },
         },
-    }).createStore();
+    })).createStore();
 
     expect(tracer).not.toHaveBeenCalled();
 
