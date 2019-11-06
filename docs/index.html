@@ -138,7 +138,7 @@ store.dispatch.inc(<span class="hljs-number">3</span>);</code></pre>
 					<h1>Description</h1>
 				</a>
 				<p>The formal documentation of the class Updux and its associated functions and
-				types can be found over <a href="./docs/classes/updux.html">here</a>.</p>
+				types can be found over <a href="https://yanick.github.io/updux/docs/classes/updux.html">here</a>.</p>
 				<a href="#exporting-upduxes" id="exporting-upduxes" style="color: inherit; text-decoration: none;">
 					<h2>Exporting upduxes</h2>
 				</a>
@@ -168,6 +168,49 @@ const updux = new Updux({ <span class="hljs-built_in">..</span>. });
     createStore,
     middleware,
 } = updux;</code></pre>
+				<a href="#mapping-a-mutation-to-all-values-of-a-state" id="mapping-a-mutation-to-all-values-of-a-state" style="color: inherit; text-decoration: none;">
+					<h2>Mapping a mutation to all values of a state</h2>
+				</a>
+				<p>Say you have a <code>todos</code> state that is an array of <code>todo</code> sub-states. It&#39;s easy
+				enough to have the main reducer maps away all items to the sub-reducer:</p>
+				<pre><code>const todo = <span class="hljs-keyword">new</span> Updux({
+    mutations: {
+        review: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> u({ reviewed: <span class="hljs-literal">true</span>}),
+        done: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> u({done: <span class="hljs-literal">true</span>}),
+    },
+});
+
+const todos = <span class="hljs-keyword">new</span> Updux({ initial: [] });
+
+todos.addMutation( 
+    todo.actions.review, 
+    <span class="hljs-function"><span class="hljs-params">(_,action)</span> =&gt;</span> state =&gt; state.map( todo.upreducer(action) )  
+);
+todos.addMutation(
+    todo.actions.done, 
+    <span class="hljs-function"><span class="hljs-params">(id,action)</span> =&gt;</span> u.map(u.<span class="hljs-keyword">if</span>(u.<span class="hljs-keyword">is</span>(<span class="hljs-string">'id'</span>,id), todo.upreducer(action))),
+);
+</code></pre><p>But <code>updeep</code> can iterate through all the items of an array (or the values of
+					an object) via the special key <code>*</code>. So the todos updux above could also be
+				written:</p>
+				<pre><code>const todo = <span class="hljs-keyword">new</span> Updux({
+    mutations: {
+        review: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> u({ reviewed: <span class="hljs-literal">true</span>}),
+        done: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> u({done: <span class="hljs-literal">true</span>}),
+    },
+});
+
+const todos = <span class="hljs-keyword">new</span> Updux({
+    subduxes: { <span class="hljs-string">'*'</span>: todo },
+});
+
+todos.addMutation(
+    todo.actions.done, 
+    <span class="hljs-function"><span class="hljs-params">(id,action)</span> =&gt;</span> u.map(u.<span class="hljs-keyword">if</span>(u.<span class="hljs-keyword">is</span>(<span class="hljs-string">'id'</span>,id), todo.upreducer(action))), 
+    <span class="hljs-literal">true</span>
+);</code></pre><p>The advantages being that the actions/mutations/effects of the subdux will be
+					imported by the root updux as usual, and all actions that aren&#39;t being
+				overridden by a sink mutation will trickle down automatically.</p>
 				<a href="#usage-with-immer" id="usage-with-immer" style="color: inherit; text-decoration: none;">
 					<h2>Usage with Immer</h2>
 				</a>
@@ -245,9 +288,6 @@ const updux = new Updux({ <span class="hljs-built_in">..</span>. });
 						<a href="globals.html#mutation" class="tsd-kind-icon">Mutation</a>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-is-not-exported">
-						<a href="globals.html#mystate" class="tsd-kind-icon">My<wbr>State</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-is-not-exported">
 						<a href="globals.html#next" class="tsd-kind-icon">Next</a>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-has-type-parameter tsd-is-not-exported">
@@ -294,15 +334,6 @@ const updux = new Updux({ <span class="hljs-built_in">..</span>. });
 					</li>
 					<li class=" tsd-kind-function tsd-is-not-exported">
 						<a href="globals.html#composemutations" class="tsd-kind-icon">compose<wbr>Mutations</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-not-exported">
-						<a href="globals.html#noopeffect" class="tsd-kind-icon">noop<wbr>Effect</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-not-exported">
-						<a href="globals.html#timeout" class="tsd-kind-icon">timeout</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-not-exported">
-						<a href="globals.html#tracer" class="tsd-kind-icon">tracer</a>
 					</li>
 				</ul>
 			</nav>

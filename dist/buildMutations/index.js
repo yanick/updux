@@ -20,12 +20,24 @@ function buildMutations(mutations = {}, subduxes = {}) {
     });
     nonGlobby.forEach(([slice, { mutations = {}, reducer = {} }]) => {
         Object.entries(mutations).forEach(([type, mutation]) => {
-            const localized = (payload = null, action) => updeep_1.default.updateIn(slice)(mutation(payload, action));
+            const localized = (payload = null, action) => {
+                return updeep_1.default.updateIn(slice)(mutation(payload, action));
+            };
             mergedMutations[type].push(localized);
         });
     });
     Object.entries(mutations).forEach(([type, mutation]) => {
-        mergedMutations[type].push(mutation);
+        if (Array.isArray(mutation)) {
+            if (mutation[1]) {
+                mergedMutations[type] = [
+                    mutation[0]
+                ];
+            }
+            else
+                mergedMutations[type].push(mutation[0]);
+        }
+        else
+            mergedMutations[type].push(mutation);
     });
     return fp_1.default.mapValues(composeMutations)(mergedMutations);
 }
