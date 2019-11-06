@@ -123,6 +123,59 @@ const {
 } = updux;
 ```
 
+## Mapping a mutation to all values of a state
+
+Say you have a `todos` state that is an array of `todo` sub-states. It's easy
+enough to have the main reducer maps away all items to the sub-reducer:
+
+```
+const todo = new Updux({
+    mutations: {
+        review: () => u({ reviewed: true}),
+        done: () => u({done: true}),
+    },
+});
+
+const todos = new Updux({ initial: [] });
+
+todos.addMutation( 
+    todo.actions.review, 
+    (_,action) => state => state.map( todo.upreducer(action) )  
+);
+todos.addMutation(
+    todo.actions.done, 
+    (id,action) => u.map(u.if(u.is('id',id), todo.upreducer(action))),
+);
+
+```
+
+But `updeep` can iterate through all the items of an array (or the values of
+an object) via the special key `*`. So the todos updux above could also be
+written:
+
+```
+const todo = new Updux({
+    mutations: {
+        review: () => u({ reviewed: true}),
+        done: () => u({done: true}),
+    },
+});
+
+const todos = new Updux({
+    subduxes: { '*': todo },
+});
+
+todos.addMutation(
+    todo.actions.done, 
+    (id,action) => u.map(u.if(u.is('id',id), todo.upreducer(action))), 
+    true
+);
+```
+
+The advantages being that the actions/mutations/effects of the subdux will be
+imported by the root updux as usual, and all actions that aren't being 
+overridden by a sink mutation will trickle down automatically.
+
 ## Usage with Immer
 
 While Updux was created with Updeep in mind, it also plays very

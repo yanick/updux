@@ -50,8 +50,6 @@ function buildMutations(
   nonGlobby.forEach(([slice, {mutations = {}, reducer = {}}]:any[]) => {
     Object.entries(mutations).forEach(([type, mutation]) => {
       const localized = (payload = null, action :Action) => {
-          console.log(slice);
-
         return u.updateIn(slice)((mutation as Mutation)(payload, action));
       }
 
