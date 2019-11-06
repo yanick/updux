@@ -189,6 +189,27 @@ export class Updux<S = any> {
   }
 
   /**
+   * Returns the upreducer made of the merge of all sudbuxes reducers, without
+   * the local mutations. Useful, for example, for sink mutations.
+   * @example
+   * ```
+   * import todo from './todo'; // updux for a single todo
+   * import Updux from 'updux';
+   * import u from 'updeep';
+   *
+   * const todos = new Updux({ initial: [], subduxes: { '*': todo } });
+   * todos.addMutation(
+   *     todo.actions.done,
+   *     ({todo_id},action) => u.map( u.if( u.is('id',todo_id) ), todos.subduxUpreducer(action) )
+   *     true
+   * );
+   * ```
+   */
+  @computed get subduxUpreducer() {
+    return buildUpreducer(this.initial, buildMutations({}, this.subduxes));
+  }
+
+  /**
    * Same as doing
    *
    * ```
@@ -248,7 +269,8 @@ export class Updux<S = any> {
    * If a local mutation was already associated to the action,
    * it will be replaced by the new one.
    * @param isSink
-   * If `true`, disables the subduxes mutations for this action.
+   * If `true`, disables the subduxes mutations for this action. To
+   * conditionally run the subduxes mutations, check out [[subduxUpreducer]].
    * @example
    * ```
    * updux.addMutation( add, inc => state => state + inc );
