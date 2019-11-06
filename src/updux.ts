@@ -42,12 +42,12 @@ export type Dux<S> = Pick<
 >;
 
 /**
-  * `Updux` is a way to minimize and simplify the boilerplate associated with the
-  * creation of a `Redux` store. It takes a shorthand configuration
-  * object, and generates the appropriate reducer, actions, middleware, etc.
-  * In true `Redux`-like fashion, upduxes can be made of sub-upduxes (`subduxes` for short) for different slices of the root state.
-  * @typeparam S Store's state type. Defaults to `any`.
-  */
+ * `Updux` is a way to minimize and simplify the boilerplate associated with the
+ * creation of a `Redux` store. It takes a shorthand configuration
+ * object, and generates the appropriate reducer, actions, middleware, etc.
+ * In true `Redux`-like fashion, upduxes can be made of sub-upduxes (`subduxes` for short) for different slices of the root state.
+ * @typeparam S Store's state type. Defaults to `any`.
+ */
 export class Updux<S = any> {
   subduxes: Dictionary<Updux>;
 
@@ -60,41 +60,41 @@ export class Updux<S = any> {
    */
   initial: S;
 
-/**
-  * Function that can be provided to alter all local mutations of the updux
-  * (the mutations of subduxes are left untouched).
-  *
-  * Can be used, for example, for Immer integration:
-  *
-  * ```
-  * import Updux from 'updux';
-  * import { produce } from 'Immer';
-  *
-  * const updux = new Updux({
-  *     initial: { counter: 0 },
-  *     groomMutations: mutation => (...args) => produce( mutation(...args) ),
-  *     mutations: {
-  *         add: (inc=1) => draft => draft.counter += inc
-  *     }
-  * });
-  *
-  * ```
-  *
-  * Or perhaps for debugging:
-  *
-  * ```
-  * import Updux from 'updux';
-  *
-  * const updux = new Updux({
-  *     initial: { counter: 0 },
-  *     groomMutations: mutation => (...args) => state => {
-  *         console.log( "got action ", args[1] );
-  *         return mutation(...args)(state);
-  *     }
-  * });
-  *
-  * ```
-  */
+  /**
+   * Function that can be provided to alter all local mutations of the updux
+   * (the mutations of subduxes are left untouched).
+   *
+   * Can be used, for example, for Immer integration:
+   *
+   * ```
+   * import Updux from 'updux';
+   * import { produce } from 'Immer';
+   *
+   * const updux = new Updux({
+   *     initial: { counter: 0 },
+   *     groomMutations: mutation => (...args) => produce( mutation(...args) ),
+   *     mutations: {
+   *         add: (inc=1) => draft => draft.counter += inc
+   *     }
+   * });
+   *
+   * ```
+   *
+   * Or perhaps for debugging:
+   *
+   * ```
+   * import Updux from 'updux';
+   *
+   * const updux = new Updux({
+   *     initial: { counter: 0 },
+   *     groomMutations: mutation => (...args) => state => {
+   *         console.log( "got action ", args[1] );
+   *         return mutation(...args)(state);
+   *     }
+   * });
+   *
+   * ```
+   */
   groomMutations: (mutation: Mutation<S>) => Mutation<S>;
 
   @observable private localEffects: Dictionary<
@@ -103,7 +103,9 @@ export class Updux<S = any> {
 
   @observable private localActions: Dictionary<ActionCreator>;
 
-  @observable private localMutations: Dictionary<Mutation<S>>;
+  @observable private localMutations: Dictionary<
+    Mutation<S> | [Mutation<S>, boolean | undefined]
+  >;
 
   constructor(config: UpduxConfig = {}) {
     this.groomMutations = config.groomMutations || ((x: Mutation<S>) => x);
@@ -187,6 +189,27 @@ export class Updux<S = any> {
   }
 
   /**
+   * Returns the upreducer made of the merge of all sudbuxes reducers, without
+   * the local mutations. Useful, for example, for sink mutations.
+   * @example
+   * ```
+   * import todo from './todo'; // updux for a single todo
+   * import Updux from 'updux';
+   * import u from 'updeep';
+   *
+   * const todos = new Updux({ initial: [], subduxes: { '*': todo } });
+   * todos.addMutation(
+   *     todo.actions.done,
+   *     ({todo_id},action) => u.map( u.if( u.is('id',todo_id) ), todos.subduxUpreducer(action) )
+   *     true
+   * );
+   * ```
+   */
+  @computed get subduxUpreducer() {
+    return buildUpreducer(this.initial, buildMutations({}, this.subduxes));
+  }
+
+  /**
    * Same as doing
    *
    * ```
@@ -245,6 +268,9 @@ export class Updux<S = any> {
    * Adds a mutation and its associated action to the updux.
    * If a local mutation was already associated to the action,
    * it will be replaced by the new one.
+   * @param isSink
+   * If `true`, disables the subduxes mutations for this action. To
+   * conditionally run the subduxes mutations, check out [[subduxUpreducer]].
    * @example
    * ```
    * updux.addMutation( add, inc => state => state + inc );
@@ -253,11 +279,13 @@ export class Updux<S = any> {
   addMutation<A extends ActionCreator>(
     creator: A,
     mutation: Mutation<S, A extends (...args: any[]) => infer R ? R : never>,
+    isSink?: boolean,
   ) {
     this.localActions[creator.type] = creator;
-    this.localMutations[creator.type] = this.groomMutations(
-      mutation as any,
-    ) as Mutation<S>;
+    this.localMutations[creator.type] = [
+      this.groomMutations(mutation as any) as Mutation<S>,
+      isSink,
+    ];
   }
 }
 

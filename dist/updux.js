@@ -43,6 +43,9 @@ class Updux {
     get mutations() {
         return buildMutations_1.default(this.localMutations, this.subduxes);
     }
+    get subduxUpreducer() {
+        return buildUpreducer_1.default(this.initial, buildMutations_1.default({}, this.subduxes));
+    }
     get createStore() {
         const actions = this.actions;
         return buildCreateStore_1.default(this.reducer, this.initial, this.middleware, this.actions);
@@ -59,9 +62,12 @@ class Updux {
             initial: this.initial,
         };
     }
-    addMutation(creator, mutation) {
+    addMutation(creator, mutation, isSink) {
         this.localActions[creator.type] = creator;
-        this.localMutations[creator.type] = this.groomMutations(mutation);
+        this.localMutations[creator.type] = [
+            this.groomMutations(mutation),
+            isSink,
+        ];
     }
 }
 __decorate([
@@ -88,6 +94,9 @@ __decorate([
 __decorate([
     mobx_1.computed
 ], Updux.prototype, "mutations", null);
+__decorate([
+    mobx_1.computed
+], Updux.prototype, "subduxUpreducer", null);
 __decorate([
     mobx_1.computed
 ], Updux.prototype, "createStore", null);
