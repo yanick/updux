@@ -4,5 +4,6 @@
     "out": "docs",
     "mode": "file",
     "excludePrivate": true,
-    "excludeNotExported": false
+    "excludeNotExported": false,
+    "exclude": [ "src/**/*test.ts" ]
 }
