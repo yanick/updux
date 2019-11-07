@@ -1,7 +1,7 @@
 import fp from 'lodash/fp';
 
 import { Middleware, MiddlewareAPI, Dispatch } from 'redux';
-import { Dictionary, ActionCreator, Action, UpduxDispatch, UpduxMiddleware } from '../types';
+import { Dictionary, ActionCreator, Action, UpduxDispatch, UpduxMiddleware, UpduxMiddlewareAPI } from '../types';
 
 const MiddlewareFor = (type: any, mw: Middleware ): Middleware => api => next => action => {
     if (type !== '*' && action.type !== type) return next(action);
@@ -20,7 +20,7 @@ function sliceMw( slice: string, mw: Middleware ): Middleware {
 }
 
 function buildMiddleware<S=any>(
-    effects : Dictionary<Middleware<{},S,UpduxDispatch>>= {},
+    effects : Dictionary<UpduxMiddleware<S>>= {},
     actions : Dictionary<ActionCreator>= {},
     subduxes :any = {},
 ): UpduxMiddleware<S>
@@ -33,7 +33,7 @@ function buildMiddleware<S=any>(
         fp.map( ([ slice, mw ]: [ string, Middleware]) => sliceMw(slice,mw) )
     )( subduxes );
 
-  return (api: MiddlewareAPI<UpduxDispatch,S>) => {
+  return (api: UpduxMiddlewareAPI<S>) => {
 
     for (let type in actions) {
       const ac = actions[type];
