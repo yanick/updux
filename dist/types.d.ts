@@ -1,4 +1,4 @@
-import { Dispatch, Middleware } from 'redux';
+import { Dispatch } from 'redux';
 declare type MaybePayload<P> = P extends object | string | boolean | number ? {
     payload: P;
 } : {
@@ -25,8 +25,14 @@ export declare type UpduxConfig<S = any> = {
     };
     mutations?: any;
     groomMutations?: (m: Mutation<S>) => Mutation<S>;
-    effects?: Dictionary<Middleware<{}, S, UpduxDispatch>>;
+    effects?: Dictionary<UpduxMiddleware<S>>;
 };
 export declare type Upreducer<S = any> = (action: Action) => (state: S) => S;
+export interface UpduxMiddlewareAPI<S> {
+    dispatch: UpduxDispatch;
+    getState(): any;
+    getRootState(): S;
+}
+export declare type UpduxMiddleware<S = any> = (api: UpduxMiddlewareAPI<S>) => (next: UpduxDispatch) => (action: Action) => any;
 export {};
 //# sourceMappingURL=types.d.ts.map

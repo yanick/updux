@@ -74,6 +74,12 @@
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
+							<h3>Interfaces</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-interface tsd-has-type-parameter"><a href="interfaces/upduxmiddlewareapi.html" class="tsd-kind-icon">Updux<wbr>MiddlewareAPI</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
 							<h3>Type aliases</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-type-alias tsd-has-type-parameter"><a href="globals.html#action" class="tsd-kind-icon">Action</a></li>
@@ -89,6 +95,7 @@
 								<li class="tsd-kind-type-alias tsd-is-not-exported"><a href="globals.html#submutations" class="tsd-kind-icon">Sub<wbr>Mutations</a></li>
 								<li class="tsd-kind-type-alias tsd-has-type-parameter"><a href="globals.html#upduxconfig" class="tsd-kind-icon">Updux<wbr>Config</a></li>
 								<li class="tsd-kind-type-alias"><a href="globals.html#upduxdispatch" class="tsd-kind-icon">Updux<wbr>Dispatch</a></li>
+								<li class="tsd-kind-type-alias tsd-has-type-parameter"><a href="globals.html#upduxmiddleware" class="tsd-kind-icon">Updux<wbr>Middleware</a></li>
 								<li class="tsd-kind-type-alias tsd-has-type-parameter"><a href="globals.html#upreducer" class="tsd-kind-icon">Upreducer</a></li>
 							</ul>
 						</section>
@@ -105,6 +112,7 @@
 								<li class="tsd-kind-function"><a href="globals.html#buildmutations" class="tsd-kind-icon">build<wbr>Mutations</a></li>
 								<li class="tsd-kind-function tsd-has-type-parameter"><a href="globals.html#buildupreducer" class="tsd-kind-icon">build<wbr>Upreducer</a></li>
 								<li class="tsd-kind-function tsd-is-not-exported"><a href="globals.html#composemutations" class="tsd-kind-icon">compose<wbr>Mutations</a></li>
+								<li class="tsd-kind-function tsd-is-not-exported"><a href="globals.html#slicemw" class="tsd-kind-icon">slice<wbr>Mw</a></li>
 							</ul>
 						</section>
 					</div>
@@ -118,7 +126,7 @@
 					<div class="tsd-signature tsd-kind-icon">Action&lt;T, P&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> &amp; </span><a href="globals.html#maybepayload" class="tsd-signature-type">MaybePayload</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">P</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in types.ts:9</li>
+							<li>Defined in <a href="https://github.com/yanick/updux/blob/8d4542f/src/types.ts#L9">types.ts:9</a></li>
 						</ul>
 					</aside>
 					<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -137,7 +145,7 @@
 					<div class="tsd-signature tsd-kind-icon">Action<wbr>Creator&lt;T, P&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">function</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in types.ts:22</li>
+							<li>Defined in <a href="https://github.com/yanick/updux/blob/8d4542f/src/types.ts#L22">types.ts:22</a></li>
 						</ul>
 					</aside>
 					<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -156,7 +164,7 @@
 					<div class="tsd-signature tsd-kind-icon">Action<wbr>Pair<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><a href="globals.html#actioncreator" class="tsd-signature-type">ActionCreator</a><span class="tsd-signature-symbol">]</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in buildActions/index.ts:33</li>
+							<li>Defined in <a href="https://github.com/yanick/updux/blob/8d4542f/src/buildActions/index.ts#L33">buildActions/index.ts:33</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -166,7 +174,7 @@
 					<div class="tsd-signature tsd-kind-icon">Action<wbr>Payload<wbr>Generator<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in types.ts:20</li>
+							<li>Defined in <a href="https://github.com/yanick/updux/blob/8d4542f/src/types.ts#L20">types.ts:20</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -197,7 +205,7 @@
 					<div class="tsd-signature tsd-kind-icon">Dictionary&lt;T&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in types.ts:13</li>
+							<li>Defined in <a href="https://github.com/yanick/updux/blob/8d4542f/src/types.ts#L13">types.ts:13</a></li>
 						</ul>
 					</aside>
 					<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -221,7 +229,7 @@
 					<div class="tsd-signature tsd-kind-icon">Dux&lt;S&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Pick</span><span class="tsd-signature-symbol">&lt;</span><a href="classes/updux.html" class="tsd-signature-type">Updux</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">S</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">"subduxes"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"actions"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"initial"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"mutations"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"reducer"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"middleware"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"createStore"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"upreducer"</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in updux.ts:32</li>
+							<li>Defined in <a href="https://github.com/yanick/updux/blob/8d4542f/src/updux.ts#L33">updux.ts:33</a></li>
 						</ul>
 					</aside>
 					<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -237,7 +245,7 @@
 					<div class="tsd-signature tsd-kind-icon">Maybe<wbr>Payload&lt;P&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">MaybePayload&lt;P&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in types.ts:3</li>
+							<li>Defined in <a href="https://github.com/yanick/updux/blob/8d4542f/src/types.ts#L3">types.ts:3</a></li>
 						</ul>
 					</aside>
 					<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -253,7 +261,7 @@
 					<div class="tsd-signature tsd-kind-icon">Mutation&lt;S, A&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in types.ts:15</li>
+							<li>Defined in <a href="https://github.com/yanick/updux/blob/8d4542f/src/types.ts#L15">types.ts:15</a></li>
 						</ul>
 					</aside>
 					<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -314,7 +322,7 @@
 					<div class="tsd-signature tsd-kind-icon">Next<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in buildMiddleware/index.ts:12</li>
+							<li>Defined in <a href="https://github.com/yanick/updux/blob/8d4542f/src/buildMiddleware/index.ts#L12">buildMiddleware/index.ts:12</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -345,7 +353,7 @@
 					<div class="tsd-signature tsd-kind-icon">Store<wbr>With<wbr>Dispatch<wbr>Actions&lt;S, Actions&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Store</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">S</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">object</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in updux.ts:25</li>
+							<li>Defined in <a href="https://github.com/yanick/updux/blob/8d4542f/src/updux.ts#L26">updux.ts:26</a></li>
 						</ul>
 					</aside>
 					<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -364,7 +372,7 @@
 					<div class="tsd-signature tsd-kind-icon">Sub<wbr>Mutations<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in buildMutations/index.ts:10</li>
+							<li>Defined in <a href="https://github.com/yanick/updux/blob/8d4542f/src/buildMutations/index.ts#L10">buildMutations/index.ts:10</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -382,7 +390,7 @@
 					<div class="tsd-signature tsd-kind-icon">Updux<wbr>Config&lt;S&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in types.ts:34</li>
+							<li>Defined in <a href="https://github.com/yanick/updux/blob/8d4542f/src/types.ts#L34">types.ts:34</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -426,7 +434,7 @@
 								</div>
 							</li>
 							<li class="tsd-parameter">
-								<h5><span class="tsd-flag ts-flagOptional">Optional</span> effects<span class="tsd-signature-symbol">?: </span><a href="globals.html#dictionary" class="tsd-signature-type">Dictionary</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Middleware</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">__type</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">S</span><span class="tsd-signature-symbol">, </span><a href="globals.html#upduxdispatch" class="tsd-signature-type">UpduxDispatch</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></h5>
+								<h5><span class="tsd-flag ts-flagOptional">Optional</span> effects<span class="tsd-signature-symbol">?: </span><a href="globals.html#dictionary" class="tsd-signature-type">Dictionary</a><span class="tsd-signature-symbol">&lt;</span><a href="globals.html#upduxmiddleware" class="tsd-signature-type">UpduxMiddleware</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">S</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></h5>
 								<div class="tsd-comment tsd-typography">
 									<div class="lead">
 										<p>Plain object defining asynchronous actions and side-effects triggered by actions.
@@ -536,9 +544,82 @@ const rootUpdux = updux({
 					<div class="tsd-signature tsd-kind-icon">Updux<wbr>Dispatch<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Dispatch</span><span class="tsd-signature-symbol"> &amp; </span><a href="globals.html#dictionary" class="tsd-signature-type">Dictionary</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Function</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in types.ts:27</li>
+							<li>Defined in <a href="https://github.com/yanick/updux/blob/8d4542f/src/types.ts#L27">types.ts:27</a></li>
 						</ul>
 					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-has-type-parameter">
+					<a name="upduxmiddleware" class="tsd-anchor"></a>
+					<h3>Updux<wbr>Middleware</h3>
+					<div class="tsd-signature tsd-kind-icon">Updux<wbr>Middleware&lt;S&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/yanick/updux/blob/8d4542f/src/types.ts#L192">types.ts:192</a></li>
+						</ul>
+					</aside>
+					<h4 class="tsd-type-parameters-title">Type parameters</h4>
+					<ul class="tsd-type-parameters">
+						<li>
+							<h4>S</h4>
+						</li>
+					</ul>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-siganture">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-type-alias tsd-is-not-exported">
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>api<span class="tsd-signature-symbol">: </span><a href="interfaces/upduxmiddlewareapi.html" class="tsd-signature-type">UpduxMiddlewareAPI</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">S</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<h4 class="tsd-parameters-title">Parameters</h4>
+										<ul class="tsd-parameters">
+											<li>
+												<h5>api: <a href="interfaces/upduxmiddlewareapi.html" class="tsd-signature-type">UpduxMiddlewareAPI</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">S</span><span class="tsd-signature-symbol">&gt;</span></h5>
+											</li>
+										</ul>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">function</span></h4>
+										<ul class="tsd-parameters">
+											<li class="tsd-parameter-siganture">
+												<ul class="tsd-signatures tsd-kind-type-literal tsd-is-not-exported">
+													<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>next<span class="tsd-signature-symbol">: </span><a href="globals.html#upduxdispatch" class="tsd-signature-type">UpduxDispatch</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span></li>
+												</ul>
+												<ul class="tsd-descriptions">
+													<li class="tsd-description">
+														<h4 class="tsd-parameters-title">Parameters</h4>
+														<ul class="tsd-parameters">
+															<li>
+																<h5>next: <a href="globals.html#upduxdispatch" class="tsd-signature-type">UpduxDispatch</a></h5>
+															</li>
+														</ul>
+														<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">function</span></h4>
+														<ul class="tsd-parameters">
+															<li class="tsd-parameter-siganture">
+																<ul class="tsd-signatures tsd-kind-type-literal tsd-is-not-exported">
+																	<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>action<span class="tsd-signature-symbol">: </span><a href="globals.html#action" class="tsd-signature-type">Action</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span></li>
+																</ul>
+																<ul class="tsd-descriptions">
+																	<li class="tsd-description">
+																		<h4 class="tsd-parameters-title">Parameters</h4>
+																		<ul class="tsd-parameters">
+																			<li>
+																				<h5>action: <a href="globals.html#action" class="tsd-signature-type">Action</a></h5>
+																			</li>
+																		</ul>
+																		<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">any</span></h4>
+																	</li>
+																</ul>
+															</li>
+														</ul>
+													</li>
+												</ul>
+											</li>
+										</ul>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-has-type-parameter">
 					<a name="upreducer" class="tsd-anchor"></a>
@@ -546,7 +627,7 @@ const rootUpdux = updux({
 					<div class="tsd-signature tsd-kind-icon">Upreducer&lt;S&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in types.ts:184</li>
+							<li>Defined in <a href="https://github.com/yanick/updux/blob/8d4542f/src/types.ts#L184">types.ts:184</a></li>
 						</ul>
 					</aside>
 					<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -608,7 +689,7 @@ const rootUpdux = updux({
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in buildMiddleware/index.ts:6</li>
+									<li>Defined in <a href="https://github.com/yanick/updux/blob/8d4542f/src/buildMiddleware/index.ts#L6">buildMiddleware/index.ts:6</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -636,7 +717,7 @@ const rootUpdux = updux({
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in buildActions/index.ts:4</li>
+									<li>Defined in <a href="https://github.com/yanick/updux/blob/8d4542f/src/buildActions/index.ts#L4">buildActions/index.ts:4</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -680,7 +761,7 @@ const rootUpdux = updux({
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in buildActions/index.ts:5</li>
+									<li>Defined in <a href="https://github.com/yanick/updux/blob/8d4542f/src/buildActions/index.ts#L5">buildActions/index.ts:5</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -703,7 +784,7 @@ const rootUpdux = updux({
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in buildActions/index.ts:6</li>
+									<li>Defined in <a href="https://github.com/yanick/updux/blob/8d4542f/src/buildActions/index.ts#L6">buildActions/index.ts:6</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -735,7 +816,7 @@ const rootUpdux = updux({
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in buildActions/index.ts:22</li>
+									<li>Defined in <a href="https://github.com/yanick/updux/blob/8d4542f/src/buildActions/index.ts#L22">buildActions/index.ts:22</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -758,7 +839,7 @@ const rootUpdux = updux({
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in buildActions/index.ts:35</li>
+									<li>Defined in <a href="https://github.com/yanick/updux/blob/8d4542f/src/buildActions/index.ts#L35">buildActions/index.ts:35</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -787,7 +868,7 @@ const rootUpdux = updux({
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in buildCreateStore/index.ts:9</li>
+									<li>Defined in <a href="https://github.com/yanick/updux/blob/8d4542f/src/buildCreateStore/index.ts#L9">buildCreateStore/index.ts:9</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -826,7 +907,7 @@ const rootUpdux = updux({
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in buildInitial/index.ts:4</li>
+									<li>Defined in <a href="https://github.com/yanick/updux/blob/8d4542f/src/buildInitial/index.ts#L4">buildInitial/index.ts:4</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -849,7 +930,7 @@ const rootUpdux = updux({
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in buildInitial/index.ts:5</li>
+									<li>Defined in <a href="https://github.com/yanick/updux/blob/8d4542f/src/buildInitial/index.ts#L5">buildInitial/index.ts:5</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -875,13 +956,13 @@ const rootUpdux = updux({
 					<a name="buildmiddleware" class="tsd-anchor"></a>
 					<h3>build<wbr>Middleware</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-has-type-parameter">
-						<li class="tsd-signature tsd-kind-icon">build<wbr>Middleware&lt;S&gt;<span class="tsd-signature-symbol">(</span>effects<span class="tsd-signature-symbol">?: </span><a href="globals.html#dictionary" class="tsd-signature-type">Dictionary</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Middleware</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">__type</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">S</span><span class="tsd-signature-symbol">, </span><a href="globals.html#upduxdispatch" class="tsd-signature-type">UpduxDispatch</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span>, actions<span class="tsd-signature-symbol">?: </span><a href="globals.html#dictionary" class="tsd-signature-type">Dictionary</a><span class="tsd-signature-symbol">&lt;</span><a href="globals.html#actioncreator" class="tsd-signature-type">ActionCreator</a><span class="tsd-signature-symbol">&gt;</span>, subMiddlewares<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Middleware</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">__type</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">S</span><span class="tsd-signature-symbol">, </span><a href="globals.html#upduxdispatch" class="tsd-signature-type">UpduxDispatch</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Middleware</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">__type</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">S</span><span class="tsd-signature-symbol">, </span><a href="globals.html#upduxdispatch" class="tsd-signature-type">UpduxDispatch</a><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">build<wbr>Middleware&lt;S&gt;<span class="tsd-signature-symbol">(</span>effects<span class="tsd-signature-symbol">?: </span><a href="globals.html#dictionary" class="tsd-signature-type">Dictionary</a><span class="tsd-signature-symbol">&lt;</span><a href="globals.html#upduxmiddleware" class="tsd-signature-type">UpduxMiddleware</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">S</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span>, actions<span class="tsd-signature-symbol">?: </span><a href="globals.html#dictionary" class="tsd-signature-type">Dictionary</a><span class="tsd-signature-symbol">&lt;</span><a href="globals.html#actioncreator" class="tsd-signature-type">ActionCreator</a><span class="tsd-signature-symbol">&gt;</span>, subduxes<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="globals.html#upduxmiddleware" class="tsd-signature-type">UpduxMiddleware</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">S</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in buildMiddleware/index.ts:14</li>
+									<li>Defined in <a href="https://github.com/yanick/updux/blob/8d4542f/src/buildMiddleware/index.ts#L22">buildMiddleware/index.ts:22</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -893,16 +974,16 @@ const rootUpdux = updux({
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> effects: <a href="globals.html#dictionary" class="tsd-signature-type">Dictionary</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Middleware</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">__type</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">S</span><span class="tsd-signature-symbol">, </span><a href="globals.html#upduxdispatch" class="tsd-signature-type">UpduxDispatch</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> =&nbsp;{}</span></h5>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> effects: <a href="globals.html#dictionary" class="tsd-signature-type">Dictionary</a><span class="tsd-signature-symbol">&lt;</span><a href="globals.html#upduxmiddleware" class="tsd-signature-type">UpduxMiddleware</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">S</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> =&nbsp;{}</span></h5>
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> actions: <a href="globals.html#dictionary" class="tsd-signature-type">Dictionary</a><span class="tsd-signature-symbol">&lt;</span><a href="globals.html#actioncreator" class="tsd-signature-type">ActionCreator</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> =&nbsp;{}</span></h5>
 								</li>
 								<li>
-									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> subMiddlewares: <span class="tsd-signature-type">Middleware</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">__type</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">S</span><span class="tsd-signature-symbol">, </span><a href="globals.html#upduxdispatch" class="tsd-signature-type">UpduxDispatch</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> =&nbsp;[]</span></h5>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> subduxes: <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol"> =&nbsp;{}</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Middleware</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">__type</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">S</span><span class="tsd-signature-symbol">, </span><a href="globals.html#upduxdispatch" class="tsd-signature-type">UpduxDispatch</a><span class="tsd-signature-symbol">&gt;</span></h4>
+							<h4 class="tsd-returns-title">Returns <a href="globals.html#upduxmiddleware" class="tsd-signature-type">UpduxMiddleware</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">S</span><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -916,7 +997,7 @@ const rootUpdux = updux({
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in buildMutations/index.ts:14</li>
+									<li>Defined in <a href="https://github.com/yanick/updux/blob/8d4542f/src/buildMutations/index.ts#L14">buildMutations/index.ts:14</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -944,7 +1025,7 @@ const rootUpdux = updux({
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in buildUpreducer/index.ts:5</li>
+									<li>Defined in <a href="https://github.com/yanick/updux/blob/8d4542f/src/buildUpreducer/index.ts#L5">buildUpreducer/index.ts:5</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -976,7 +1057,7 @@ const rootUpdux = updux({
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in buildMutations/index.ts:5</li>
+									<li>Defined in <a href="https://github.com/yanick/updux/blob/8d4542f/src/buildMutations/index.ts#L5">buildMutations/index.ts:5</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1028,6 +1109,32 @@ const rootUpdux = updux({
 						</li>
 					</ul>
 				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-is-not-exported">
+					<a name="slicemw" class="tsd-anchor"></a>
+					<h3>slice<wbr>Mw</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-is-not-exported">
+						<li class="tsd-signature tsd-kind-icon">slice<wbr>Mw<span class="tsd-signature-symbol">(</span>slice<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, mw<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Middleware</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Middleware</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/yanick/updux/blob/8d4542f/src/buildMiddleware/index.ts#L14">buildMiddleware/index.ts:14</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>slice: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>mw: <span class="tsd-signature-type">Middleware</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Middleware</span></h4>
+						</li>
+					</ul>
+				</section>
 			</section>
 		</div>
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
@@ -1042,6 +1149,9 @@ const rootUpdux = updux({
 				<ul class="before-current">
 					<li class=" tsd-kind-class tsd-has-type-parameter">
 						<a href="classes/updux.html" class="tsd-kind-icon">Updux</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
+						<a href="interfaces/upduxmiddlewareapi.html" class="tsd-kind-icon">Updux<wbr>MiddlewareAPI</a>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-has-type-parameter">
 						<a href="globals.html#action" class="tsd-kind-icon">Action</a>
@@ -1083,6 +1193,9 @@ const rootUpdux = updux({
 						<a href="globals.html#upduxdispatch" class="tsd-kind-icon">Updux<wbr>Dispatch</a>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-has-type-parameter">
+						<a href="globals.html#upduxmiddleware" class="tsd-kind-icon">Updux<wbr>Middleware</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-has-type-parameter">
 						<a href="globals.html#upreducer" class="tsd-kind-icon">Upreducer</a>
 					</li>
 					<li class=" tsd-kind-function tsd-is-not-exported">
@@ -1114,6 +1227,9 @@ const rootUpdux = updux({
 					</li>
 					<li class=" tsd-kind-function tsd-is-not-exported">
 						<a href="globals.html#composemutations" class="tsd-kind-icon">compose<wbr>Mutations</a>
+					</li>
+					<li class=" tsd-kind-function tsd-is-not-exported">
+						<a href="globals.html#slicemw" class="tsd-kind-icon">slice<wbr>Mw</a>
 					</li>
 				</ul>
 			</nav>
