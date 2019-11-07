@@ -132,12 +132,15 @@ export class Updux<S = any> {
    * A middleware aggregating all the effects defined in the
    * updux and its subduxes. Effects of the updux itself are
    * done before the subduxes effects.
+   * Note that `getState` will always return the state of the
+   * local updux. The function `getRootState` is provided
+   * alongside `getState` to get the root state.
    */
   @computed get middleware(): Middleware<{}, S, UpduxDispatch> {
     return buildMiddleware(
       this.localEffects,
       this.actions,
-      Object.values(this.subduxes).map(sd => sd.middleware),
+      this.subduxes,
     );
   }
 

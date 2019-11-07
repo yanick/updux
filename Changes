@@ -1,5 +1,10 @@
 # Revision history for Updux
 
+1.2.0 2019-11-06
+    - The middleware's 'getState' returns the local state of its updux,
+        instead of the root state. Plus we add `getRootState` to get
+        the root state.
+
 1.1.0 2019-11-05
     - Document mapping behavior of the '*' subdux.
     - add subduxUpreducer.
