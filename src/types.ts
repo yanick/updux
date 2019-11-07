@@ -178,7 +178,16 @@ export type UpduxConfig<S=any> = {
    * ```
    *
    */
-  effects?: Dictionary<Middleware<{}, S, UpduxDispatch>>;
+  effects?: Dictionary<UpduxMiddleware<S>>;
 };
 
 export type Upreducer<S = any> = (action: Action) => (state: S) => S;
+
+export interface UpduxMiddlewareAPI<S> {
+    dispatch: UpduxDispatch,
+    getState(): any,
+    getRootState(): S
+
+}
+export type UpduxMiddleware<S=any> = (api: UpduxMiddlewareAPI<S> ) => ( next: UpduxDispatch ) => ( action: Action ) => any;
+
