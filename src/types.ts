@@ -1,23 +1,29 @@
-import {Dispatch, Middleware} from 'redux';
+import { Dispatch, Middleware } from "redux";
 
 type MaybePayload<P> = P extends object | string | boolean | number
   ? {
       payload: P;
     }
-  : {payload?: P};
+  : { payload?: P };
 
 export type Action<T extends string = string, P = any> = {
   type: T;
 } & MaybePayload<P>;
 
-export type Dictionary<T> = {[key: string]: T};
+export type Dictionary<T> = { [key: string]: T };
 
 export type Mutation<S = any, A extends Action = Action> = (
-  payload: A['payload'],
-  action: A,
+  payload: A["payload"],
+  action: A
 ) => (state: S) => S;
 
 export type ActionPayloadGenerator = (...args: any[]) => any;
+
+export type MutationEntry = [
+  ActionCreator | string,
+  Mutation<any, Action<string, any>>,
+  boolean?
+];
 
 export type ActionCreator<T extends string = string, P = any> = {
   type: T;
@@ -26,12 +32,11 @@ export type ActionCreator<T extends string = string, P = any> = {
 
 export type UpduxDispatch = Dispatch & Dictionary<Function>;
 
-
 /**
-  * Configuration object given to Updux's constructor.
-  * @typeparam S Type of the Updux's state. Defaults to `any`.
-  */
-export type UpduxConfig<S=any> = {
+ * Configuration object given to Updux's constructor.
+ * @typeparam S Type of the Updux's state. Defaults to `any`.
+ */
+export type UpduxConfig<S = any> = {
   /**
    * The default initial state of the reducer. Can be anything your
    * heart desires.
@@ -155,7 +160,7 @@ export type UpduxConfig<S=any> = {
    *     }
    * });
    */
-  mutations?: any;
+  mutations?: { [actionType: string]: Mutation<S> } | MutationEntry[];
 
   groomMutations?: (m: Mutation<S>) => Mutation<S>;
 
@@ -184,10 +189,10 @@ export type UpduxConfig<S=any> = {
 export type Upreducer<S = any> = (action: Action) => (state: S) => S;
 
 export interface UpduxMiddlewareAPI<S> {
-    dispatch: UpduxDispatch,
-    getState(): any,
-    getRootState(): S
-
+  dispatch: UpduxDispatch;
+  getState(): any;
+  getRootState(): S;
 }
-export type UpduxMiddleware<S=any> = (api: UpduxMiddlewareAPI<S> ) => ( next: UpduxDispatch ) => ( action: Action ) => any;
-
+export type UpduxMiddleware<S = any> = (
+  api: UpduxMiddlewareAPI<S>
+) => (next: UpduxDispatch) => (action: Action) => any;

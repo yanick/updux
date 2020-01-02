@@ -1,14 +1,14 @@
-import fp from 'lodash/fp';
-import u from 'updeep';
-import {observable, computed, toJS} from 'mobx';
+import fp from "lodash/fp";
+import u from "updeep";
+import { observable, computed, toJS } from "mobx";
 
-import buildActions from './buildActions';
-import buildInitial from './buildInitial';
-import buildMutations from './buildMutations';
+import buildActions, { actionFor } from "./buildActions";
+import buildInitial from "./buildInitial";
+import buildMutations from "./buildMutations";
 
-import buildCreateStore from './buildCreateStore';
-import buildMiddleware from './buildMiddleware';
-import buildUpreducer from './buildUpreducer';
+import buildCreateStore from "./buildCreateStore";
+import buildMiddleware from "./buildMiddleware";
+import buildUpreducer from "./buildUpreducer";
 import {
   UpduxConfig,
   Dictionary,
@@ -17,29 +17,30 @@ import {
   Mutation,
   Upreducer,
   UpduxDispatch,
-  UpduxMiddleware
-} from './types';
+  UpduxMiddleware,
+  MutationEntry
+} from "./types";
 
-import {Middleware, Store} from 'redux';
-export {actionCreator} from './buildActions';
+import { Middleware, Store } from "redux";
+export { actionCreator } from "./buildActions";
 
 type StoreWithDispatchActions<
   S = any,
-  Actions = {[action: string]: (...args: any) => Action}
+  Actions = { [action: string]: (...args: any) => Action }
 > = Store<S> & {
-  dispatch: {[type in keyof Actions]: (...args: any) => void};
+  dispatch: { [type in keyof Actions]: (...args: any) => void };
 };
 
 export type Dux<S> = Pick<
   Updux<S>,
-  | 'subduxes'
-  | 'actions'
-  | 'initial'
-  | 'mutations'
-  | 'reducer'
-  | 'middleware'
-  | 'createStore'
-  | 'upreducer'
+  | "subduxes"
+  | "actions"
+  | "initial"
+  | "mutations"
+  | "reducer"
+  | "middleware"
+  | "createStore"
+  | "upreducer"
 >;
 
 /**
@@ -98,35 +99,36 @@ export class Updux<S = any> {
    */
   groomMutations: (mutation: Mutation<S>) => Mutation<S>;
 
-  @observable private localEffects: Dictionary<
-    UpduxMiddleware<S>
-  >;
+  @observable private localEffects: Dictionary<UpduxMiddleware<S>>;
 
   @observable private localActions: Dictionary<ActionCreator>;
 
   @observable private localMutations: Dictionary<
     Mutation<S> | [Mutation<S>, boolean | undefined]
-  >;
+  > = {};
 
   constructor(config: UpduxConfig = {}) {
     this.groomMutations = config.groomMutations || ((x: Mutation<S>) => x);
 
     this.subduxes = fp.mapValues((value: UpduxConfig | Updux) =>
-      fp.isPlainObject(value) ? new Updux(value) : value,
-    )(fp.getOr({}, 'subduxes', config)) as Dictionary<Updux>;
+      fp.isPlainObject(value) ? new Updux(value) : value
+    )(fp.getOr({}, "subduxes", config)) as Dictionary<Updux>;
 
-    this.localActions = fp.getOr({}, 'actions', config);
+    this.localActions = fp.getOr({}, "actions", config);
 
-    this.localEffects = fp.getOr({}, 'effects', config);
+    this.localEffects = fp.getOr({}, "effects", config);
 
     this.initial = buildInitial<any>(
       config.initial,
-      fp.mapValues(({initial}) => initial)(this.subduxes),
+      fp.mapValues(({ initial }) => initial)(this.subduxes)
     );
 
-    this.localMutations = fp.mapValues((m: Mutation<S>) =>
-      this.groomMutations(m),
-    )(fp.getOr({}, 'mutations', config));
+    let mutations = fp.getOr([], "mutations", config);
+    if (!Array.isArray(mutations)) {
+      mutations = fp.toPairs(mutations);
+    }
+
+    mutations.forEach(args => (this.addMutation as any)(...args));
   }
 
   /**
@@ -138,11 +140,7 @@ export class Updux<S = any> {
    * alongside `getState` to get the root state.
    */
   @computed get middleware(): UpduxMiddleware<S> {
-    return buildMiddleware(
-      this.localEffects,
-      this.actions,
-      this.subduxes,
-    );
+    return buildMiddleware(this.localEffects, this.actions, this.subduxes);
   }
 
   /**
@@ -164,10 +162,10 @@ export class Updux<S = any> {
       this.localActions,
       [...Object.keys(this.localMutations), ...Object.keys(this.localEffects)],
       fp.flatten(
-        Object.values(this.subduxes).map(({actions}: Updux) =>
-          Object.entries(actions),
-        ),
-      ),
+        Object.values(this.subduxes).map(({ actions }: Updux) =>
+          Object.entries(actions)
+        )
+      )
     );
   }
 
@@ -245,7 +243,7 @@ export class Updux<S = any> {
       this.reducer,
       this.initial,
       this.middleware as Middleware,
-      this.actions,
+      this.actions
     ) as () => StoreWithDispatchActions<S, typeof actions>;
   }
 
@@ -264,7 +262,7 @@ export class Updux<S = any> {
       actions: this.actions,
       reducer: this.reducer,
       mutations: this.mutations,
-      initial: this.initial,
+      initial: this.initial
     };
   }
 
@@ -283,12 +281,15 @@ export class Updux<S = any> {
   addMutation<A extends ActionCreator>(
     creator: A,
     mutation: Mutation<S, A extends (...args: any[]) => infer R ? R : never>,
-    isSink?: boolean,
+    isSink?: boolean
   ) {
-    this.localActions[creator.type] = creator;
-    this.localMutations[creator.type] = [
+    let c = fp.isFunction(creator) ? creator : actionFor(creator);
+
+    this.localActions[c.type] = c;
+
+    this.localMutations[c.type] = [
       this.groomMutations(mutation as any) as Mutation<S>,
-      isSink,
+      isSink
     ];
   }
 }
