@@ -1,8 +1,7 @@
 import fp from "lodash/fp";
 import u from "updeep";
-import { observable, computed, toJS } from "mobx";
 
-import buildActions, { actionFor } from "./buildActions";
+import buildActions, { actionFor, actionCreator } from "./buildActions";
 import buildInitial from "./buildInitial";
 import buildMutations from "./buildMutations";
 
@@ -18,7 +17,8 @@ import {
   Upreducer,
   UpduxDispatch,
   UpduxMiddleware,
-  MutationEntry
+  MutationEntry,
+  EffectEntry
 } from "./types";
 
 import { Middleware, Store } from "redux";
@@ -99,11 +99,11 @@ export class Updux<S = any> {
    */
   groomMutations: (mutation: Mutation<S>) => Mutation<S>;
 
-  @observable private localEffects: Dictionary<UpduxMiddleware<S>>;
+  private localEffects: EffectEntry<S>[] = [];
 
-  @observable private localActions: Dictionary<ActionCreator>;
+  private localActions: Dictionary<ActionCreator> = {};
 
-  @observable private localMutations: Dictionary<
+  private localMutations: Dictionary<
     Mutation<S> | [Mutation<S>, boolean | undefined]
   > = {};
 
@@ -114,9 +114,18 @@ export class Updux<S = any> {
       fp.isPlainObject(value) ? new Updux(value) : value
     )(fp.getOr({}, "subduxes", config)) as Dictionary<Updux>;
 
-    this.localActions = fp.getOr({}, "actions", config);
+    const actions = fp.getOr({}, "actions", config);
+    Object.entries(actions).forEach(([type, payload]: [string, any]): any =>
+      this.addAction(
+        (payload as any).type ? payload : actionCreator(type, payload as any)
+      )
+    );
 
-    this.localEffects = fp.getOr({}, "effects", config);
+    let effects = fp.getOr([], "effects", config);
+    if (!Array.isArray(effects)) {
+      effects = Object.entries(effects);
+    }
+    effects.forEach(effect => this.addEffect(...effect));
 
     this.initial = buildInitial<any>(
       config.initial,
@@ -132,15 +141,15 @@ export class Updux<S = any> {
   }
 
   /**
-   * A middleware aggregating all the effects defined in the
+   * Array of middlewares aggregating all the effects defined in the
    * updux and its subduxes. Effects of the updux itself are
    * done before the subduxes effects.
    * Note that `getState` will always return the state of the
    * local updux. The function `getRootState` is provided
    * alongside `getState` to get the root state.
    */
-  @computed get middleware(): UpduxMiddleware<S> {
-    return buildMiddleware(this.localEffects, this.actions, this.subduxes);
+  get middleware(): UpduxMiddleware<S> {
+    return buildMiddleware(this._middlewareEntries, this.actions);
   }
 
   /**
@@ -157,19 +166,19 @@ export class Updux<S = any> {
    *     actions generated from mutations/effects < non-custom subduxes actions <
    *     custom subduxes actions < custom actions
    */
-  @computed get actions(): Dictionary<ActionCreator> {
-    return buildActions(
-      this.localActions,
-      [...Object.keys(this.localMutations), ...Object.keys(this.localEffects)],
-      fp.flatten(
+  get actions(): Dictionary<ActionCreator> {
+    return buildActions([
+      ...(Object.entries(this.localActions) as any),
+      ...(fp.flatten(
         Object.values(this.subduxes).map(({ actions }: Updux) =>
           Object.entries(actions)
         )
-      )
-    );
+      ) as any),
+      ,
+    ]);
   }
 
-  @computed get upreducer(): Upreducer<S> {
+  get upreducer(): Upreducer<S> {
     return buildUpreducer(this.initial, this.mutations);
   }
 
@@ -177,7 +186,7 @@ export class Updux<S = any> {
    * A Redux reducer generated using the computed initial state and
    * mutations.
    */
-  @computed get reducer(): (state: S | undefined, action: Action) => S {
+  get reducer(): (state: S | undefined, action: Action) => S {
     return (state, action) => this.upreducer(action)(state as S);
   }
 
@@ -186,7 +195,7 @@ export class Updux<S = any> {
    * mutations in both the main updux and its subduxes, the subduxes
    * mutations will be performed first.
    */
-  @computed get mutations(): Dictionary<Mutation<S>> {
+  get mutations(): Dictionary<Mutation<S>> {
     return buildMutations(this.localMutations, this.subduxes);
   }
 
@@ -207,7 +216,7 @@ export class Updux<S = any> {
    * );
    * ```
    */
-  @computed get subduxUpreducer() {
+  get subduxUpreducer() {
     return buildUpreducer(this.initial, buildMutations({}, this.subduxes));
   }
 
@@ -236,14 +245,14 @@ export class Updux<S = any> {
    * // still work
    * store.dispatch( actions.addTodo(...) );
    */
-  @computed get createStore(): () => StoreWithDispatchActions<S> {
+  get createStore(): () => StoreWithDispatchActions<S> {
     const actions = this.actions;
 
     return buildCreateStore<S>(
       this.reducer,
       this.initial,
-      this.middleware as Middleware,
-      this.actions
+      this.middleware as any,
+      actions
     ) as () => StoreWithDispatchActions<S, typeof actions>;
   }
 
@@ -285,12 +294,66 @@ export class Updux<S = any> {
   ) {
     let c = fp.isFunction(creator) ? creator : actionFor(creator);
 
-    this.localActions[c.type] = c;
+    this.addAction(c);
 
     this.localMutations[c.type] = [
       this.groomMutations(mutation as any) as Mutation<S>,
       isSink
     ];
+  }
+
+  addEffect(
+    creator: ActionCreator | string,
+    middleware: UpduxMiddleware<S>,
+    isGenerator: boolean = false
+  ) {
+    let c = fp.isFunction(creator) ? creator : actionFor(creator);
+
+    this.addAction(c);
+    this.localActions[c.type] = c;
+    this.localEffects.push([c.type, middleware, isGenerator]);
+  }
+
+  addAction(action: string | ActionCreator<any>) {
+    if (typeof action === "string") {
+      if (!this.localActions[action]) {
+        this.localActions[action] = actionFor(action);
+      }
+    } else {
+      this.localActions[action.type] = action;
+    }
+  }
+
+  get _middlewareEntries() {
+    const groupByOrder = (mws: any) =>
+      fp.groupBy(
+        ([_, actionType]: any) =>
+          ["^", "$"].includes(actionType) ? actionType : "middle",
+        mws
+      );
+
+    let subs = fp.flow([
+      fp.mapValues("_middlewareEntries"),
+      fp.toPairs,
+      fp.map(([slice, entries]) =>
+        entries.map(([ps, ...args]: any) => [[slice, ...ps], ...args])
+      ),
+      fp.flatten,
+      groupByOrder
+    ])(this.subduxes);
+
+    let local = groupByOrder(this.localEffects.map(x => [[], ...x]));
+
+    return fp.flatten(
+      [
+        local["^"],
+        subs["^"],
+        local.middle,
+        subs.middle,
+        subs["$"],
+        local["$"]
+      ].filter(x => x)
+    );
   }
 }
 

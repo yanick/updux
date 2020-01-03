@@ -44,32 +44,14 @@ export function actionFor(type: string): ActionCreator {
 
 type ActionPair = [string, ActionCreator];
 
-function buildActions(
-  generators: Dictionary<ActionPayloadGenerator> = {},
-  actionNames: string[] = [],
-  subActions: ActionPair[] = []
-): Dictionary<ActionCreator> {
+function buildActions(actions: ActionPair[] = []): Dictionary<ActionCreator> {
   // priority => generics => generic subs => craft subs => creators
 
   const [crafted, generic] = fp.partition(([type, f]) => !f._genericAction)(
-    subActions
+    fp.compact(actions)
   );
 
-  const actions: any = [
-    ...actionNames.map(type => [type, actionFor(type)]),
-    ...generic,
-    ...crafted,
-    ...Object.entries(
-      generators
-    ).map(([type, payload]: [string, Function]): any => [
-      type,
-      (payload as any).type
-        ? payload
-        : (...args: any) => ({ type, payload: payload(...args) })
-    ])
-  ];
-
-  return fp.fromPairs(actions);
+  return fp.fromPairs([...generic, ...crafted]);
 }
 
 export default buildActions;

@@ -1,7 +1,7 @@
-import Updux from '.';
-import u from 'updeep';
+import Updux, { actionCreator } from ".";
+import u from "updeep";
 
-test('simple effect', () => {
+test("simple effect", () => {
   const tracer = jest.fn();
 
   const store = new Updux({
@@ -9,13 +9,13 @@ test('simple effect', () => {
       foo: (api: any) => (next: any) => (action: any) => {
         tracer();
         next(action);
-      },
-    },
+      }
+    }
   }).createStore();
 
   expect(tracer).not.toHaveBeenCalled();
 
-  store.dispatch({type: 'bar'});
+  store.dispatch({ type: "bar" });
 
   expect(tracer).not.toHaveBeenCalled();
 
@@ -24,11 +24,11 @@ test('simple effect', () => {
   expect(tracer).toHaveBeenCalled();
 });
 
-test('effect and sub-effect', () => {
+test("effect and sub-effect", () => {
   const tracer = jest.fn();
 
   const tracerEffect = (signature: string) => (api: any) => (next: any) => (
-    action: any,
+    action: any
   ) => {
     tracer(signature);
     next(action);
@@ -36,27 +36,27 @@ test('effect and sub-effect', () => {
 
   const store = new Updux({
     effects: {
-      foo: tracerEffect('root'),
+      foo: tracerEffect("root")
     },
     subduxes: {
       zzz: {
         effects: {
-          foo: tracerEffect('child'),
-        },
-      },
-    },
+          foo: tracerEffect("child")
+        }
+      }
+    }
   }).createStore();
 
   expect(tracer).not.toHaveBeenCalled();
 
-  store.dispatch({type: 'bar'});
+  store.dispatch({ type: "bar" });
 
   expect(tracer).not.toHaveBeenCalled();
 
   store.dispatch.foo();
 
-  expect(tracer).toHaveBeenNthCalledWith(1, 'root');
-  expect(tracer).toHaveBeenNthCalledWith(2, 'child');
+  expect(tracer).toHaveBeenNthCalledWith(1, "root");
+  expect(tracer).toHaveBeenNthCalledWith(2, "child");
 });
 
 test('"*" effect', () => {
@@ -64,21 +64,21 @@ test('"*" effect', () => {
 
   const store = new Updux({
     effects: {
-      '*': api => next => action => {
+      "*": api => next => action => {
         tracer();
         next(action);
-      },
-    },
+      }
+    }
   }).createStore();
 
   expect(tracer).not.toHaveBeenCalled();
 
-  store.dispatch({type: 'bar'});
+  store.dispatch({ type: "bar" });
 
   expect(tracer).toHaveBeenCalled();
 });
 
-test('async effect', async () => {
+test("async effect", async () => {
   function timeout(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
@@ -91,8 +91,8 @@ test('async effect', async () => {
         next(action);
         await timeout(1000);
         tracer();
-      },
-    },
+      }
+    }
   }).createStore();
 
   expect(tracer).not.toHaveBeenCalled();
@@ -106,37 +106,123 @@ test('async effect', async () => {
   expect(tracer).toHaveBeenCalled();
 });
 
-test('getState is local', () => {
+test("getState is local", () => {
   let childState;
   let rootState;
   let rootFromChild;
 
   const child = new Updux({
-    initial: {alpha: 12},
+    initial: { alpha: 12 },
     effects: {
-      doIt: ({getState,getRootState}) => next => action => {
+      doIt: ({ getState, getRootState }) => next => action => {
         childState = getState();
         rootFromChild = getRootState();
         next(action);
-      },
-    },
+      }
+    }
   });
 
   const root = new Updux({
-    initial: {beta: 24},
-    subduxes: {child},
+    initial: { beta: 24 },
+    subduxes: { child },
     effects: {
-      doIt: ({getState}) => next => action => {
+      doIt: ({ getState }) => next => action => {
         rootState = getState();
         next(action);
-      },
-    },
+      }
+    }
   });
 
   const store = root.createStore();
   store.dispatch.doIt();
 
-  expect(rootState).toEqual({beta: 24, child: {alpha: 12}});
-  expect(rootFromChild).toEqual({beta: 24, child: {alpha: 12}});
-  expect(childState).toEqual({alpha: 12});
+  expect(rootState).toEqual({ beta: 24, child: { alpha: 12 } });
+  expect(rootFromChild).toEqual({ beta: 24, child: { alpha: 12 } });
+  expect(childState).toEqual({ alpha: 12 });
+});
+
+test("middleware as map", () => {
+  let childState;
+  let rootState;
+  let rootFromChild;
+
+  const doIt = actionCreator("doIt");
+
+  const child = new Updux({
+    initial: "",
+    effects: [
+      [
+        doIt,
+        () => next => action => {
+          next(u({ payload: (p: string) => p + "Child" }, action) as any);
+        }
+      ]
+    ]
+  });
+
+  const root = new Updux({
+    initial: { message: "" },
+    subduxes: { child },
+    effects: [
+      [
+        "^",
+        () => next => action => {
+          next(u({ payload: (p: string) => p + "Pre" }, action) as any);
+        }
+      ],
+      [
+        doIt,
+        () => next => action => {
+          next(u({ payload: (p: string) => p + "Root" }, action) as any);
+        }
+      ],
+      [
+        "*",
+        () => next => action => {
+          next(u({ payload: (p: string) => p + "After" }, action) as any);
+        }
+      ],
+      [
+        "$",
+        () => next => action => {
+          next(u({ payload: (p: string) => p + "End" }, action) as any);
+        }
+      ]
+    ],
+    mutations: [[doIt, (message: any) => () => ({ message })]]
+  });
+
+  const store = root.createStore();
+  store.dispatch.doIt("");
+
+  expect(store.getState()).toEqual({ message: "PreRootAfterChildEnd" });
+});
+
+test("generator", () => {
+  const updux = new Updux({
+    initial: 0,
+    mutations: [["doIt", payload => () => payload]],
+    effects: [
+      [
+        "doIt",
+        () => {
+          let i = 0;
+          return () => (next: any) => (action: any) =>
+            next({ ...action, payload: ++i });
+        },
+        true
+      ]
+    ]
+  });
+
+  const store1 = updux.createStore();
+  store1.dispatch.doIt();
+  expect(store1.getState()).toEqual(1);
+  store1.dispatch.doIt();
+  expect(store1.getState()).toEqual(2);
+  updux.actions;
+
+  const store2 = updux.createStore();
+  store2.dispatch.doIt();
+  expect(store2.getState()).toEqual(1);
 });

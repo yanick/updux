@@ -183,8 +183,14 @@ export type UpduxConfig<S = any> = {
    * ```
    *
    */
-  effects?: Dictionary<UpduxMiddleware<S>>;
+  effects?: Dictionary<UpduxMiddleware<S>> | EffectEntry<S>[];
 };
+
+export type EffectEntry<S> = [
+  ActionCreator | string,
+  UpduxMiddleware<S>,
+  boolean?
+];
 
 export type Upreducer<S = any> = (action: Action) => (state: S) => S;
 
