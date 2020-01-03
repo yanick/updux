@@ -18,10 +18,12 @@ import {
   UpduxDispatch,
   UpduxMiddleware,
   MutationEntry,
-  EffectEntry
+  EffectEntry,
+  Selector
 } from "./types";
 
 import { Middleware, Store, PreloadedState } from "redux";
+import buildSelectors from "./buildSelectors";
 export { actionCreator } from "./buildActions";
 
 type StoreWithDispatchActions<
@@ -46,9 +48,12 @@ export type Dux<S> = Pick<
 export class Updux<S = any> {
   subduxes: Dictionary<Updux>;
 
+  private local_selectors: Dictionary<Selector<S>> = {};
+
    initial: S;
 
    groomMutations: (mutation: Mutation<S>) => Mutation<S>;
+
 
   private localEffects: EffectEntry<S>[] = [];
 
@@ -60,6 +65,9 @@ export class Updux<S = any> {
 
   constructor(config: UpduxConfig = {}) {
     this.groomMutations = config.groomMutations || ((x: Mutation<S>) => x);
+
+    const selectors = fp.getOr( {}, 'selectors', config ) as Dictionary<Selector>;
+    Object.entries(selectors).forEach( ([name,sel]: [string,Function]) => this.addSelector(name,sel as Selector) );
 
     this.subduxes = fp.mapValues((value: UpduxConfig | Updux) =>
       fp.isPlainObject(value) ? new Updux(value) : value
@@ -218,6 +226,14 @@ export class Updux<S = any> {
         local["$"]
       ].filter(x => x)
     );
+  }
+
+  addSelector( name: string, selector: Selector) {
+      this.local_selectors[name] = selector;
+  }
+
+  get selectors() {
+      return buildSelectors(this.local_selectors,this.subduxes);
   }
 }
 

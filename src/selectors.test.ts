@@ -21,7 +21,9 @@ test('basic selectors', () => {
         }
     };
 
+    console.log(updux.selectors);
+
     expect( updux.selectors.bogeys(state) ).toEqual( { foo:1, bar :2 } );
-    expect( updux.selectors.bogey(state)('foo')).toEqual(1);
+    expect( (updux.selectors.bogey(state) as any)('foo')).toEqual(1);
 
 });

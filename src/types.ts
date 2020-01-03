@@ -202,3 +202,5 @@ export interface UpduxMiddlewareAPI<S> {
 export type UpduxMiddleware<S = any> = (
   api: UpduxMiddlewareAPI<S>
 ) => (next: UpduxDispatch) => (action: Action) => any;
+
+export type Selector<S = any> = (state:S) => unknown;
