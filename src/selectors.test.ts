@@ -12,7 +12,7 @@ test('basic selectors', () => {
         selectors: {
             bogeys: ({ bogeys }: any) => bogeys,
         },
-    } as any);
+    });
 
     const state = {
         bogeys: {
@@ -20,8 +20,6 @@ test('basic selectors', () => {
             bar: 2
         }
     };
-
-    console.log(updux.selectors);
 
     expect( updux.selectors.bogeys(state) ).toEqual( { foo:1, bar :2 } );
     expect( (updux.selectors.bogey(state) as any)('foo')).toEqual(1);

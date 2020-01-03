@@ -98,6 +98,8 @@ export type UpduxConfig<S = any> = {
     [type: string]: ActionCreator;
   };
 
+  selectors?: Dictionary<Selector>;
+
   /**
    * Object mapping actions to the associated state mutation.
    *

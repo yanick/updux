@@ -46,20 +46,20 @@ export type Dux<S> = Pick<
 >;
 
 export class Updux<S = any> {
-  subduxes: Dictionary<Updux>;
+   subduxes: Dictionary<Updux> = {};
 
-  private local_selectors: Dictionary<Selector<S>> = {};
+   private local_selectors: Dictionary<Selector<S>> = {};
 
    initial: S;
 
    groomMutations: (mutation: Mutation<S>) => Mutation<S>;
 
 
-  private localEffects: EffectEntry<S>[] = [];
+   private localEffects: EffectEntry<S>[] = [];
 
-  private localActions: Dictionary<ActionCreator> = {};
+   private localActions: Dictionary<ActionCreator> = {};
 
-  private localMutations: Dictionary<
+   private localMutations: Dictionary<
     Mutation<S> | [Mutation<S>, boolean | undefined]
   > = {};
 
@@ -69,9 +69,11 @@ export class Updux<S = any> {
     const selectors = fp.getOr( {}, 'selectors', config ) as Dictionary<Selector>;
     Object.entries(selectors).forEach( ([name,sel]: [string,Function]) => this.addSelector(name,sel as Selector) );
 
-    this.subduxes = fp.mapValues((value: UpduxConfig | Updux) =>
-      fp.isPlainObject(value) ? new Updux(value) : value
-    )(fp.getOr({}, "subduxes", config)) as Dictionary<Updux>;
+    Object.entries( fp.mapValues((value: UpduxConfig | Updux) =>
+      fp.isPlainObject(value) ? new Updux(value as any) : value
+    )(fp.getOr({}, "subduxes", config))).forEach(
+        ([slice,sub]) => this.subduxes[slice] = sub as any
+    );
 
     const actions = fp.getOr({}, "actions", config);
     Object.entries(actions).forEach(([type, payload]: [string, any]): any =>
@@ -104,7 +106,6 @@ export class Updux<S = any> {
   }
 
    get actions(): Dictionary<ActionCreator> {
-
     return buildActions([
       ...(Object.entries(this.localActions) as any),
       ...(fp.flatten(
@@ -116,7 +117,7 @@ export class Updux<S = any> {
     ]);
   }
 
-  get upreducer(): Upreducer<S> {
+   get upreducer(): Upreducer<S> {
     return buildUpreducer(this.initial, this.mutations);
   }
 
@@ -232,8 +233,8 @@ export class Updux<S = any> {
       this.local_selectors[name] = selector;
   }
 
-  get selectors() {
-      return buildSelectors(this.local_selectors,this.subduxes);
+   get selectors() {
+        return buildSelectors(this.local_selectors, this.subduxes);
   }
 }
 
