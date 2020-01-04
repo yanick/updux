@@ -200,9 +200,10 @@ export interface UpduxMiddlewareAPI<S> {
   dispatch: UpduxDispatch;
   getState(): any;
   getRootState(): S;
+  selectors: Dictionary<Selector>;
 }
 export type UpduxMiddleware<S = any> = (
   api: UpduxMiddlewareAPI<S>
 ) => (next: UpduxDispatch) => (action: Action) => any;
 
-export type Selector<S = any> = (state:S) => unknown;
+export type Selector<S = any> = (state:S) => any;

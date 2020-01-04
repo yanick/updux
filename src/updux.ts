@@ -200,22 +200,21 @@ export class Updux<S = any> {
   get _middlewareEntries() {
     const groupByOrder = (mws: any) =>
       fp.groupBy(
-        ([_, actionType]: any) =>
+        ([a,b, actionType]: any) =>
           ["^", "$"].includes(actionType) ? actionType : "middle",
         mws
       );
 
     let subs = fp.flow([
-      fp.mapValues("_middlewareEntries"),
       fp.toPairs,
-      fp.map(([slice, entries]) =>
-        entries.map(([ps, ...args]: any) => [[slice, ...ps], ...args])
+      fp.map(([slice, updux]) =>
+        updux._middlewareEntries.map(([u, ps, ...args]: any) => [u,[slice, ...ps], ...args])
       ),
       fp.flatten,
       groupByOrder
     ])(this.subduxes);
 
-    let local = groupByOrder(this.localEffects.map(x => [[], ...x]));
+    let local = groupByOrder(this.localEffects.map(x => [this,[], ...x]));
 
     return fp.flatten(
       [
