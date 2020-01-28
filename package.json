@@ -5,6 +5,8 @@
       "redux": "^4.0.4"
    },
    "devDependencies": {
+      "docsify": "^4.10.2",
+      "docsify-cli": "^4.4.0",
       "@babel/cli": "^7.6.4",
       "@babel/core": "^7.6.4",
       "@babel/preset-env": "^7.6.3",
@@ -23,6 +25,7 @@
    "name": "updux",
    "description": "Updeep-friendly Redux helper framework",
    "scripts": {
+      "docsify:serve": "docsify serve docs",
       "build": "tsc && typedoc",
       "test": "jest"
    },
@@ -40,5 +43,10 @@
       "url": "https://github.com/yanick/updux/issues"
    },
    "homepage": "https://github.com/yanick/updux#readme",
-   "types": "./dist/index.d.ts"
+   "types": "./dist/index.d.ts",
+   "prettier": {
+      "tabWidth": 4,
+      "singleQuote": true,
+      "trailingComma": "es5"
+   }
 }
