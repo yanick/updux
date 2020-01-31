@@ -77,8 +77,7 @@ store.dispatch.inc(3);
 
 # Description
 
-The formal documentation of the class Updux and its associated functions and
-types can be found over [here](https://yanick.github.io/updux/docs/classes/updux.html).
+Full documentation can be [found here](https://yanick.github.io/updux/docs/).
 
 ## Exporting upduxes
 
