@@ -3,4 +3,3 @@
 * [Home](/)
 * API Reference
     * [Updux](updux.md)
-* [Types](types.md)
