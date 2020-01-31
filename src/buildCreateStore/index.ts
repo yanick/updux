@@ -3,12 +3,13 @@ import {
   applyMiddleware,
   Middleware,
   Reducer,
+  PreloadedState
 } from 'redux';
 import { ActionCreator, Dictionary } from '../types';
 
 function buildCreateStore<S>(
   reducer: Reducer<S>,
-  initial: S,
+  initial: PreloadedState<S>,
   middleware: Middleware,
   actions: Dictionary<ActionCreator>,
 ) {
