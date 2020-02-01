@@ -21,7 +21,7 @@ import {
   EffectEntry
 } from "./types";
 
-import { Middleware, Store } from "redux";
+import { Middleware, Store, PreloadedState } from "redux";
 export { actionCreator } from "./buildActions";
 
 type StoreWithDispatchActions<
@@ -129,7 +129,7 @@ export class Updux<S = any> {
 
     return buildCreateStore<S>(
       this.reducer,
-      this.initial,
+      this.initial as PreloadedState<S>,
       this.middleware as any,
       actions
     ) as () => StoreWithDispatchActions<S, typeof actions>;
@@ -175,14 +175,17 @@ export class Updux<S = any> {
     this.localEffects.push([c.type, middleware, isGenerator]);
   }
 
-  addAction(action: string | ActionCreator<any>) {
+  addAction(action: string, transform?: any): ActionCreator<string,any>
+  addAction(action: ActionCreator<any>, transform?: never): ActionCreator<string,any>
+  addAction(action: any,transform:any) {
     if (typeof action === "string") {
       if (!this.localActions[action]) {
-        this.localActions[action] = actionFor(action);
+        this.localActions[action] = actionCreator(action,transform);
       }
-    } else {
-      this.localActions[action.type] = action;
+      return this.localActions[action];
     }
+
+    return this.localActions[action.type] = action;
   }
 
   get _middlewareEntries() {

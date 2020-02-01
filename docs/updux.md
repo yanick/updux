@@ -283,7 +283,9 @@ store.dispatch.addTodo(...);
 store.dispatch( actions.addTodo(...) );
 ``` 
 
-## asDux 
+## Methods
+
+### asDux 
 
   
 Returns a [ducks](https://github.com/erikras/ducks-modular-redux)-like
@@ -291,7 +293,7 @@ plain object holding the reducer from the Updux object and all
 its trimmings.
    
 
-## addMutation
+### addMutation
 
 Adds a mutation and its associated action to the updux.
 If a local mutation was already associated to the action,
@@ -303,3 +305,30 @@ conditionally run the subduxes mutations, check out [[subduxUpreducer]].
 ```js
 updux.addMutation( add, inc => state => state + inc );
 ```
+
+### addAction
+
+```js
+const action = updux.addAction( name, ...creatorArgs );
+const action = updux.addAction( otherActionCreator );
+```
+
+Adds an action to the updux. It can take an already defined action creator,
+or any arguments that can be passed to `actionCreator`.
+
+```js
+import {actionCreator, Updux} from 'updux';
+
+const updux = new Updux(); 
+
+const foo = updux.addAction('foo');
+const bar = updux.addAction( 'bar', (x) => ({stuff: x+1}) );
+
+const baz = actionCreator( 'baz' );
+
+foo({ a: 1});  // => { type: 'foo', payload: { a: 1 } }
+bar(2);        // => { type: 'bar', payload: { stuff: 3 } }
+baz();         // => { type: 'baz', payload: undefined }
+
+```
+
