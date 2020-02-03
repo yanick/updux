@@ -16,7 +16,6 @@
       "jest": "^24.9.0",
       "ts-jest": "^24.1.0",
       "tsd": "^0.10.0",
-      "typedoc": "^0.15.0",
       "typescript": "^3.6.4",
       "updeep": "^1.2.0"
    },
@@ -26,7 +25,7 @@
    "description": "Updeep-friendly Redux helper framework",
    "scripts": {
       "docsify:serve": "docsify serve docs",
-      "build": "tsc && typedoc",
+      "build": "tsc",
       "test": "jest"
    },
    "version": "1.2.0",
