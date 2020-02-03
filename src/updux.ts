@@ -18,10 +18,12 @@ import {
   UpduxDispatch,
   UpduxMiddleware,
   MutationEntry,
-  EffectEntry
+  EffectEntry,
+  Selector
 } from "./types";
 
 import { Middleware, Store, PreloadedState } from "redux";
+import buildSelectors from "./buildSelectors";
 export { actionCreator } from "./buildActions";
 
 type StoreWithDispatchActions<
@@ -44,26 +46,34 @@ export type Dux<S> = Pick<
 >;
 
 export class Updux<S = any> {
-  subduxes: Dictionary<Updux>;
+   subduxes: Dictionary<Updux> = {};
+
+   private local_selectors: Dictionary<Selector<S>> = {};
 
    initial: S;
 
    groomMutations: (mutation: Mutation<S>) => Mutation<S>;
 
-  private localEffects: EffectEntry<S>[] = [];
 
-  private localActions: Dictionary<ActionCreator> = {};
+   private localEffects: EffectEntry<S>[] = [];
 
-  private localMutations: Dictionary<
+   private localActions: Dictionary<ActionCreator> = {};
+
+   private localMutations: Dictionary<
     Mutation<S> | [Mutation<S>, boolean | undefined]
   > = {};
 
   constructor(config: UpduxConfig = {}) {
     this.groomMutations = config.groomMutations || ((x: Mutation<S>) => x);
 
-    this.subduxes = fp.mapValues((value: UpduxConfig | Updux) =>
-      fp.isPlainObject(value) ? new Updux(value) : value
-    )(fp.getOr({}, "subduxes", config)) as Dictionary<Updux>;
+    const selectors = fp.getOr( {}, 'selectors', config ) as Dictionary<Selector>;
+    Object.entries(selectors).forEach( ([name,sel]: [string,Function]) => this.addSelector(name,sel as Selector) );
+
+    Object.entries( fp.mapValues((value: UpduxConfig | Updux) =>
+      fp.isPlainObject(value) ? new Updux(value as any) : value
+    )(fp.getOr({}, "subduxes", config))).forEach(
+        ([slice,sub]) => this.subduxes[slice] = sub as any
+    );
 
     const actions = fp.getOr({}, "actions", config);
     Object.entries(actions).forEach(([type, payload]: [string, any]): any =>
@@ -96,7 +106,6 @@ export class Updux<S = any> {
   }
 
    get actions(): Dictionary<ActionCreator> {
-
     return buildActions([
       ...(Object.entries(this.localActions) as any),
       ...(fp.flatten(
@@ -108,7 +117,7 @@ export class Updux<S = any> {
     ]);
   }
 
-  get upreducer(): Upreducer<S> {
+   get upreducer(): Upreducer<S> {
     return buildUpreducer(this.initial, this.mutations);
   }
 
@@ -191,22 +200,21 @@ export class Updux<S = any> {
   get _middlewareEntries() {
     const groupByOrder = (mws: any) =>
       fp.groupBy(
-        ([_, actionType]: any) =>
+        ([a,b, actionType]: any) =>
           ["^", "$"].includes(actionType) ? actionType : "middle",
         mws
       );
 
     let subs = fp.flow([
-      fp.mapValues("_middlewareEntries"),
       fp.toPairs,
-      fp.map(([slice, entries]) =>
-        entries.map(([ps, ...args]: any) => [[slice, ...ps], ...args])
+      fp.map(([slice, updux]) =>
+        updux._middlewareEntries.map(([u, ps, ...args]: any) => [u,[slice, ...ps], ...args])
       ),
       fp.flatten,
       groupByOrder
     ])(this.subduxes);
 
-    let local = groupByOrder(this.localEffects.map(x => [[], ...x]));
+    let local = groupByOrder(this.localEffects.map(x => [this,[], ...x]));
 
     return fp.flatten(
       [
@@ -218,6 +226,14 @@ export class Updux<S = any> {
         local["$"]
       ].filter(x => x)
     );
+  }
+
+  addSelector( name: string, selector: Selector) {
+      this.local_selectors[name] = selector;
+  }
+
+   get selectors() {
+        return buildSelectors(this.local_selectors, this.subduxes);
   }
 }
 

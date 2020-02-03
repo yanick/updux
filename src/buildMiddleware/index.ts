@@ -10,6 +10,7 @@ import {
   UpduxMiddlewareAPI,
   EffectEntry
 } from "../types";
+import Updux from "..";
 
 const MiddlewareFor = (
   type: any,
@@ -23,12 +24,13 @@ const MiddlewareFor = (
 
 type Next = (action: Action) => any;
 
-function sliceMw(slice: string, mw: Middleware): Middleware {
+function sliceMw(slice: string, mw: Middleware, updux: Updux): Middleware {
   return api => {
     const getSliceState =
       slice.length > 0 ? () => fp.get(slice, api.getState()) : api.getState;
     const getRootState = (api as any).getRootState || api.getState;
-    return mw({ ...api, getState: getSliceState, getRootState } as any);
+    return mw({ ...api, getState: getSliceState, getRootState,
+        selectors: updux.selectors } as any);
   };
 }
 
@@ -37,11 +39,11 @@ function buildMiddleware<S = any>(
   actions: Dictionary<ActionCreator> = {}
 ): UpduxMiddleware<S> {
   let mws = middlewareEntries
-    .map(([slice, actionType, mw, isGen]: any) =>
-      isGen ? [slice, actionType, mw()] : [slice, actionType, mw]
+    .map(([updux, slice, actionType, mw, isGen]: any) =>
+      isGen ? [updux, slice, actionType, mw()] : [updux, slice, actionType, mw]
     )
-    .map(([slice, actionType, mw]) =>
-      MiddlewareFor(actionType, sliceMw(slice, mw))
+    .map(([updux, slice, actionType, mw]) =>
+      MiddlewareFor(actionType, sliceMw(slice, mw, updux))
     );
 
   return (api: UpduxMiddlewareAPI<S>) => {
