@@ -36,6 +36,23 @@ const { actions } = updux({
 
 actions.foo({ x: 1, y: 2 }); // => { type: foo, payload: { x:1, y:2  } }
 actions.bar(1,2);            // => { type: bar, payload: { x:1, y:2  } }
+
+
+#### selectors
+
+Dictionary of selectors for the current updux. The updux also
+inherit its dubduxes' selectors. 
+
+The selectors are available via the class' getter and, for 
+middlewares, the middlewareApi.
+
+```js
+const todoUpdux = new Updux({
+    selectors: {
+        done: state => state.filter( ({done}) => done ),
+        byId: state => targetId => state.find( ({id}) => id === targetId ),
+    }
+}
 ```
 
 #### mutations
@@ -331,4 +348,12 @@ bar(2);        // => { type: 'bar', payload: { stuff: 3 } }
 baz();         // => { type: 'baz', payload: undefined }
 
 ```
+
+### selectors
+
+Returns a dictionary of the 
+updux's selectors. Subduxes' selectors 
+are included as well (with the mapping to the sub-state already 
+taken care of you).
+
 
