@@ -1,7 +1,9 @@
-import Updux, { actionCreator } from "./updux";
+import { action } from 'ts-action';
+
+import Updux from "./updux";
 
 describe("as array of arrays", () => {
-  const doIt = actionCreator("doIt");
+  const doIt = action("doIt");
 
   const updux = new Updux({
     initial: "",

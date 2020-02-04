@@ -1,5 +1,7 @@
-import Updux, { actionCreator } from '.';
 import u from 'updeep';
+import { action, payload } from 'ts-action';
+
+import Updux from '.';
 import mwUpdux from './middleware_aux';
 
 test('simple effect', () => {
@@ -179,7 +181,7 @@ test('middleware as map', () => {
     let rootState;
     let rootFromChild;
 
-    const doIt = actionCreator('doIt');
+    const doIt = action('doIt', () => ({payload: ''}));
 
     const child = new Updux({
         initial: '',

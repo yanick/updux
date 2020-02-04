@@ -2,22 +2,23 @@
    "dependencies": {
       "lodash": "^4.17.15",
       "mobx": "^5.14.2",
-      "redux": "^4.0.4"
+      "redux": "^4.0.4",
+      "ts-action": "^11.0.0",
+      "updeep": "^1.2.0"
    },
    "devDependencies": {
-      "docsify": "^4.10.2",
-      "docsify-cli": "^4.4.0",
       "@babel/cli": "^7.6.4",
       "@babel/core": "^7.6.4",
       "@babel/preset-env": "^7.6.3",
       "@types/jest": "^24.0.19",
       "@types/lodash": "^4.14.144",
       "babel-jest": "^24.9.0",
+      "docsify": "^4.10.2",
+      "docsify-cli": "^4.4.0",
       "jest": "^24.9.0",
       "ts-jest": "^24.1.0",
       "tsd": "^0.10.0",
-      "typescript": "^3.6.4",
-      "updeep": "^1.2.0"
+      "typescript": "^3.6.4"
    },
    "license": "MIT",
    "main": "dist/index.js",
