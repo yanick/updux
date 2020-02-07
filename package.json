@@ -1,7 +1,6 @@
 {
    "dependencies": {
       "lodash": "^4.17.15",
-      "mobx": "^5.14.2",
       "redux": "^4.0.4",
       "ts-action": "^11.0.0",
       "updeep": "^1.2.0"
