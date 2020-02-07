@@ -13,11 +13,6 @@ test('actions from mutations', () => {
 
   expect(foo(true)).toEqual({type: 'foo', payload: true});
 
-  expect(foo({bar: 2}, {timestamp: 613})).toEqual({
-    type: 'foo',
-    payload: {bar: 2},
-    meta: {timestamp: 613},
-  });
 });
 
 test('reducer', () => {

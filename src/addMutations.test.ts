@@ -1,4 +1,6 @@
-import Updux, { actionCreator } from "./updux";
+import { action } from 'ts-action';
+
+import Updux from "./updux";
 
 type MyState = {
   sum: number;
@@ -9,7 +11,7 @@ test("added mutation is present", () => {
     initial: { sum: 0 }
   });
 
-  const add = actionCreator("add", (n: number) => ({ n }));
+  const add = action("add", (n: number) => ({ payload: {  n } }));
 
   updux.addMutation(add, ({ n }, action) => ({ sum }) => ({ sum: sum + n }));
 

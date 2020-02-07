@@ -1,7 +1,8 @@
 import fp from "lodash/fp";
 import u from "updeep";
+import { action, payload } from 'ts-action';
 
-import buildActions, { actionFor, actionCreator } from "./buildActions";
+import buildActions from "./buildActions";
 import buildInitial from "./buildInitial";
 import buildMutations from "./buildMutations";
 
@@ -24,7 +25,6 @@ import {
 
 import { Middleware, Store, PreloadedState } from "redux";
 import buildSelectors from "./buildSelectors";
-export { actionCreator } from "./buildActions";
 
 type StoreWithDispatchActions<
   S = any,
@@ -76,9 +76,9 @@ export class Updux<S = any> {
     );
 
     const actions = fp.getOr({}, "actions", config);
-    Object.entries(actions).forEach(([type, payload]: [string, any]): any =>
+    Object.entries(actions).forEach(([type, p]: [string, any]): any =>
       this.addAction(
-        (payload as any).type ? payload : actionCreator(type, payload as any)
+        (p as any).type ? p : action(type, p)
       )
     );
 
@@ -157,14 +157,23 @@ export class Updux<S = any> {
     };
   }
 
-  addMutation<A extends ActionCreator>(
+  addMutation<A extends ActionCreator=any>(
     creator: A,
     mutation: Mutation<S, A extends (...args: any[]) => infer R ? R : never>,
     isSink?: boolean
-  ) {
-    let c = fp.isFunction(creator) ? creator : actionFor(creator);
-
-    this.addAction(c);
+  )
+  addMutation<A extends ActionCreator=any>(
+    creator: string,
+    mutation: Mutation<S, any>,
+    isSink?: boolean
+  )
+  addMutation<A extends ActionCreator=any>(
+    creator,
+    mutation,
+    isSink
+  )
+  {
+    let c = this.addAction(creator);
 
     this.localMutations[c.type] = [
       this.groomMutations(mutation as any) as Mutation<S>,
@@ -177,24 +186,34 @@ export class Updux<S = any> {
     middleware: UpduxMiddleware<S>,
     isGenerator: boolean = false
   ) {
-    let c = fp.isFunction(creator) ? creator : actionFor(creator);
-
-    this.addAction(c);
-    this.localActions[c.type] = c;
+    const c = this.addAction(creator);
     this.localEffects.push([c.type, middleware, isGenerator]);
   }
 
-  addAction(action: string, transform?: any): ActionCreator<string,any>
-  addAction(action: ActionCreator<any>, transform?: never): ActionCreator<string,any>
-  addAction(action: any,transform:any) {
-    if (typeof action === "string") {
-      if (!this.localActions[action]) {
-        this.localActions[action] = actionCreator(action,transform);
-      }
-      return this.localActions[action];
+  // can be
+  //addAction( actionCreator )
+  // addAction( 'foo', transform )
+  addAction(theaction: string, transform?: any): ActionCreator<string,any>
+  addAction(theaction: string|ActionCreator<any>, transform?: never): ActionCreator<string,any>
+  addAction(theaction: any,transform:any) {
+    if (typeof theaction === "string") {
+        if(transform !== undefined ) {
+            theaction = action(theaction,transform);
+        }
+        else {
+            theaction = this.actions[theaction] || action(theaction,payload())
+        }
     }
 
-    return this.localActions[action.type] = action;
+    const already = this.actions[theaction.type];
+    if( already ) {
+        if ( already !== theaction ) {
+        throw new Error(`action ${theaction.type} already exists`)
+        }
+        return already;
+    }
+
+    return this.localActions[theaction.type] = theaction;
   }
 
   get _middlewareEntries() {
