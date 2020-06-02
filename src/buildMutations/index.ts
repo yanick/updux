@@ -1,71 +1,57 @@
-import fp from "lodash/fp";
-import u from "updeep";
-import { Mutation, Action, Dictionary, MutationEntry } from "../types";
+import fp from 'lodash/fp';
+import u from 'updeep';
+import {
+    Mutation,
+    Action,
+    Dictionary,
+    MutationEntry,
+    Upreducer,
+} from '../types';
+import Updux from '..';
 
-const composeMutations = (mutations: Mutation[]) =>
-  mutations.reduce((m1, m2) => (payload: any = null, action: Action) => state =>
-    m2(payload, action)(m1(payload, action)(state))
-  );
+const composeMutations = (mutations: Mutation[]) => {
+    if (mutations.length == 0) return () => state => state;
+
+    return mutations.reduce(
+        (m1, m2) => (payload: any = null, action: Action) => state =>
+            m2(payload, action)(m1(payload, action)(state))
+    );
+};
 
 type SubMutations = {
-  [slice: string]: Dictionary<Mutation>;
+    [slice: string]: Dictionary<Mutation>;
 };
 
 function buildMutations(
-  mutations: Dictionary<Mutation | [Mutation, boolean | undefined]> = {},
-  subduxes = {}
+    mutations: Dictionary<Mutation | [Mutation, boolean | undefined]> = {},
+    subduxes = {},
+    coduxes: Upreducer[] = []
 ) {
-  // we have to differentiate the subduxes with '*' than those
-  // without, as the root '*' is not the same as any sub-'*'
+    const submuts = Object.entries(subduxes).map(
+        ([slice, upreducer]: [string, any]) =>
+            <Mutation>(
+                ((payload, action: Action) =>
+                    (u.updateIn as any)(slice, upreducer(action)))
+            )
+    );
 
-  const actions = fp.uniq(
-    Object.keys(mutations).concat(
-      ...Object.values(subduxes).map(({ mutations = {} }: any) =>
-        Object.keys(mutations)
-      )
-    )
-  );
+    const comuts = coduxes.map(c => (payload, action: Action) => c(action));
 
-  let mergedMutations: Dictionary<Mutation[]> = {};
+    const subreducer = composeMutations([...submuts, ...comuts]);
 
-  let [globby, nonGlobby] = fp.partition(
-    ([_, { mutations = {} }]: any) => mutations["*"],
-    Object.entries(subduxes)
-  );
+    let merged = {};
 
-  globby = fp.flow([
-    fp.fromPairs,
-    fp.mapValues(({ reducer }) => (_: any, action: Action) => (state: any) =>
-      reducer(state, action)
-    )
-  ])(globby);
-
-  const globbyMutation = (payload: any, action: Action) =>
-    u(fp.mapValues((mut: any) => mut(payload, action))(globby));
-
-  actions.forEach(action => {
-    mergedMutations[action] = [globbyMutation];
-  });
-
-  nonGlobby.forEach(([slice, { mutations = {}, reducer = {} }]: any[]) => {
     Object.entries(mutations).forEach(([type, mutation]) => {
-      const localized = (payload = null, action: Action) => {
-        return u.updateIn(slice)((mutation as Mutation)(payload, action));
-      };
+        const [m, sink] = Array.isArray(mutation)
+            ? mutation
+            : [mutation, false];
 
-      mergedMutations[type].push(localized);
+        merged[type] = sink ? m : composeMutations([subreducer, m]);
     });
-  });
 
-  Object.entries(mutations).forEach(([type, mutation]) => {
-    if (Array.isArray(mutation)) {
-      if (mutation[1]) {
-        mergedMutations[type] = [mutation[0]];
-      } else mergedMutations[type].push(mutation[0]);
-    } else mergedMutations[type].push(mutation);
-  });
+    if (!merged['*']) merged['*'] = subreducer;
 
-  return fp.mapValues(composeMutations)(mergedMutations);
+    return merged;
 }
 
 export default buildMutations;

@@ -1,12 +1,12 @@
-import Updux from '.';
+import Updux, {dux} from '.';
 
 const updux = new Updux({
     subduxes: {
-        foo: { initial: "banana" }
+        foo: dux({ initial: "banana" })
     }
 });
 
-updux.addEffect('*', api => next => action => {
+updux.addEffect('*', () => next => action => {
     next({...action, meta: "gotcha" });
 });
 

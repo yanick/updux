@@ -1,23 +1,27 @@
-import Updux from '.';
+import Updux, {dux} from '.';
+import u from 'updeep';
+import { action, payload } from 'ts-action';
+import tap from 'tap';
 
-test('actions from mutations', () => {
+tap.test('actions from mutations', async t => {
   const {
     actions: {foo, bar},
-  } = new Updux({
+  } : any = new Updux({
     mutations: {
       foo: () => (x:any) => x,
     },
   });
 
-  expect(foo()).toEqual({type: 'foo'});
-
-  expect(foo(true)).toEqual({type: 'foo', payload: true});
+  t.match( foo(), { type: 'foo' } );
+  t.same( foo(true), {type: 'foo', payload: true});
 
 });
 
-test('reducer', () => {
-  const {actions, reducer} = new Updux({
+tap.test('reducer', async t => {
+  const inc = action('inc');
+  const {actions, reducer} = dux({
     initial: {counter: 1},
+    actions: { inc },
     mutations: {
       inc: () => ({counter}:{counter:number}) => ({counter: counter + 1}),
     },
@@ -25,24 +29,28 @@ test('reducer', () => {
 
   let state = reducer(undefined, {type:'noop'});
 
-  expect(state).toEqual({counter: 1});
+  t.same(state,{counter: 1});
 
   state = reducer(state, actions.inc());
 
-  expect(state).toEqual({counter: 2});
+  t.same(state,{counter: 2});
 });
 
-test( 'sub reducers', () => {
-    const foo = new Updux({
+tap.test( 'sub reducers', async t => {
+    const doAll = action('doAll', payload<number>() );
+
+    const foo = dux({
         initial: 1,
+        actions: { doAll },
         mutations: {
             doFoo: () => (x:number) => x + 1,
             doAll: () => (x:number) => x + 10,
         },
     });
 
-    const bar = new Updux({
+    const bar = dux({
         initial: 'a',
+        actions: { doAll },
         mutations: {
             doBar: () => (x:string) => x + 'a',
             doAll: () => (x:string) => x + 'b',
@@ -55,34 +63,34 @@ test( 'sub reducers', () => {
         }
     });
 
-    expect(initial).toEqual({ foo: 1, bar: 'a' });
+    t.same(initial,{ foo: 1, bar: 'a' });
 
-    expect(Object.keys(actions)).toHaveLength(3);
+    t.is(Object.keys(actions).length,3);
 
     let state = reducer(undefined,{type:'noop'});
 
-    expect(state).toEqual({ foo: 1, bar: 'a' });
+    t.same(state,{ foo: 1, bar: 'a' });
 
-    state = reducer(state, actions.doFoo() );
+    state = reducer(state, (actions as any).doFoo() );
 
-    expect(state).toEqual({ foo: 2, bar: 'a' });
+    t.same(state,{ foo: 2, bar: 'a' });
 
-    state = reducer(state, actions.doBar() );
+    state = reducer(state, (actions as any).doBar() );
 
-    expect(state).toEqual({ foo: 2, bar: 'aa' });
+    t.same(state,{ foo: 2, bar: 'aa' });
 
-    state = reducer(state, actions.doAll() );
+    state = reducer(state, (actions as any).doAll() );
 
-    expect(state).toEqual({ foo: 12, bar: 'aab' });
+    t.same(state,{ foo: 12, bar: 'aab' });
 
 });
 
-test('precedence between root and sub-reducers', () => {
+tap.test('precedence between root and sub-reducers', async t => {
     const {
         initial,
         reducer,
         actions,
-    } = new Updux({
+    } =  dux({
         initial: {
             foo: { bar: 4 },
         },
@@ -95,7 +103,7 @@ test('precedence between root and sub-reducers', () => {
             }
         },
         subduxes: {
-            foo: {
+            foo: dux({
                 initial: {
                     bar: 2,
                     quux: 3,
@@ -103,15 +111,16 @@ test('precedence between root and sub-reducers', () => {
                 mutations: {
                     inc: () => (state:any) => ({...state, bar: state.bar + 1 })
                 },
-            },
+            }),
         }
     });
 
-    expect(initial).toEqual({
+    // quick fix until https://github.com/facebook/jest/issues/9531
+    t.same(initial,{
         foo: { bar: 4, quux: 3 }
     });
 
-    expect( reducer(undefined,actions.inc() ) ).toEqual({
+    t.same( reducer(undefined,(actions as any).inc() ) ,{
         foo: { bar: 5, quux: 3 }, surprise: 5
     });
 
@@ -121,67 +130,73 @@ function timeout(ms:number) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-test( 'middleware', async () => {
+tap.test( 'middleware', async t => {
     const {
         middleware,
-        createStore
-    } = new Updux({
-        initial: "",
+        createStore,
+        actions,
+    } = dux({
+        initial: { result: [] },
         mutations: {
-            inc: (addition:number) => (state:number) => state + addition,
-            doEeet: () => (state:number) => {
-                return state + 'Z';
-            },
+            inc: (addition:number) => u({ result: r => [ ...r, addition ]}),
+            doEeet: () => u({ result: r => [ ...r, 'Z' ]}),
         },
         effects: {
             doEeet: api => next => async action => {
-                api.dispatch.inc('a');
+                api.dispatch( api.actions.inc('a') );
                 next(action);
                 await timeout(1000);
-                api.dispatch.inc('c');
+                api.dispatch( api.actions.inc('c') );
             }
         },
         subduxes: {
-            foo: {
+            foo: dux({
                 effects: {
                     doEeet: (api:any) => ( next:any ) => ( action: any ) => {
                         api.dispatch({ type: 'inc', payload: 'b'});
                         next(action);
                     }
                 }
-            },
+            }),
         }
     });
 
-    const store = createStore();
+    const store :any = createStore();
 
-    store.dispatch.doEeet();
+    store.dispatch( (actions as any).doEeet() );
 
-    expect(store.getState()).toEqual( 'abZ' );
+    t.is(store.getState().result.join(''),'abZ' );
 
     await timeout(1000);
 
-    expect(store.getState()).toEqual( 'abZc' );
+    t.is(store.getState().result.join(''), 'abZc' );
 
 });
 
 
-test( "subduxes and mutations", () => {
-    const foo = new Updux({ mutations: {
+tap.test( "subduxes and mutations", async t => {
+    const quux = action('quux');
+
+    const foo = dux({
+        actions: { quux },
+        mutations: {
         quux: () => () => 'x',
         blart: () => () => 'a',
     }});
-    const bar = new Updux({ mutations: {
+    const bar = dux({
+        actions: { quux },
+        mutations: {
         quux: () => () => 'y'
     }});
-    const baz = new Updux({
+    const baz = dux({
+        actions: { quux },
         mutations: {
         quux: () => (state:any) => ({...state, "baz": "z" })
     }, subduxes: { foo, bar } });
 
-    let state = baz.reducer(undefined, baz.actions.quux() );
+    let state = baz.reducer(undefined, (baz.actions as any).quux() );
 
-    expect(state).toEqual({
+    t.same(state,{
         foo: "x",
         bar: "y",
         baz: "z",

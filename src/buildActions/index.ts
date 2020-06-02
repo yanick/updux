@@ -1,12 +1,15 @@
 import fp from 'lodash/fp';
 import {
-    ActionCreator,
+    ActionCreator
+} from 'ts-action';
+
+import {
     Dictionary,
 } from '../types';
 
 type ActionPair = [string, ActionCreator];
 
-function buildActions(actions: ActionPair[] = []): Dictionary<ActionCreator> {
+function buildActions(actions: ActionPair[] = []): Dictionary<ActionCreator<string,(...args: any) => {type: string} >>{
     // priority => generics => generic subs => craft subs => creators
 
     const [crafted, generic] = fp.partition(([type, f]) => !f._genericAction)(

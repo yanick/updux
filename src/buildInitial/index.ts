@@ -1,13 +1,16 @@
 import fp from 'lodash/fp';
-import { Dictionary } from '../types';
+import u from 'updeep';
 
-function buildInitial<S extends number|string|boolean>( initial: S, subduxes?: Dictionary<undefined> ): S;
-function buildInitial<S extends object>( initial?: Partial<S>, subduxes?: Partial<S> ): S extends object ? S : never;
-function buildInitial(
-  initial : any = {},
-  subduxes : any = {} ,
-) {
-  return fp.isPlainObject(initial) ? fp.mergeAll([subduxes, initial]) : initial;
+function buildInitial(initial: any, coduxes: any = [], subduxes: any = {}) {
+    if (!fp.isPlainObject(initial)) return initial;
+
+    return fp.flow(
+        [
+            u(fp.omit(['*'], subduxes)),
+            coduxes.map(i => u(i)),
+            u(initial),
+        ].flat()
+    )({});
 }
 
 export default buildInitial;

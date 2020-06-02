@@ -1,28 +1,31 @@
 import Updux from './updux';
 import u from 'updeep';
+import tap from 'tap';
 
-const todo = new Updux({
+const todo: any = new Updux<any>({
     mutations: {
-        review: () => u({ reviewed: true}),
-        done: () => u({done: true}),
+        review: () => u({ reviewed: true }),
+        done: () => u({ done: true }),
     },
 });
 
-const todos = new Updux({
+const todos: any = new Updux({
     subduxes: { '*': todo },
 });
 
 todos.addMutation(
-    todo.actions.done, (id,action) => u.map(u.if(u.is('id',id), todo.upreducer(action))), true
+    todo.actions.done,
+    (id, action) => u.map(u.if(u.is('id', id), todo.upreducer(action))),
+    true
 );
 
-test( '* for mapping works', () => {
+tap.test('* for mapping works', async t => {
     const reducer = todos.reducer;
-    let state = [ { id: 0 }, {id: 1 } ];
-    state = reducer( state, todos.actions.review() );
-    state = reducer( state, todos.actions.done(1) );
+    let state = [{ id: 0 }, { id: 1 }];
+    state = reducer(state, todos.actions.review());
+    state = reducer(state, todos.actions.done(1));
 
-    expect(state).toEqual([
+    t.same(state, [
         { id: 0, reviewed: true },
         { id: 1, reviewed: true, done: true },
     ]);

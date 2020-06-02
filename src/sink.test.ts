@@ -1,56 +1,57 @@
-import Updux from './updux';
+import Updux, { dux } from '.';
+import tap from 'tap';
+import { action } from 'ts-action';
 
-const foo = new Updux<number>({
-  initial: 0,
-  mutations: {
-    doIt: () => (state: number) => {
-      return state + 1;
+const foo = dux({
+    initial: 0,
+    actions: {
+       doIt: action('doIt'),
+       doTheThing: action('doTheThing'),
     },
-    doTheThing: () => (state: number) => {
-      return state + 3;
+    mutations: {
+        doIt: () => (state: number) => {
+            return state + 1;
+        },
+        doTheThing: () => (state: number) => {
+            return state + 3;
+        },
     },
-  },
 });
 
-const bar = new Updux<{foo: number}>({
-  subduxes: {foo},
+const bar: any = new Updux<{ foo: number }>({
+    subduxes: { foo },
 });
 
 bar.addMutation(
-  foo.actions.doTheThing,
-  (_, action) => state => {
-    return {
-      ...state,
-      baz: bar.subduxUpreducer(action)(state),
-    };
-  },
-  true,
+    foo.actions.doTheThing,
+    (_, action) => state => {
+        return {
+            ...state,
+            baz: foo.upreducer(action)(state.foo),
+        };
+    },
+    true
 );
 
 bar.addMutation(
-  foo.actions.doIt,
-  () => (state: any) => ({...state, bar: 'yay'}),
-  true,
+    foo.actions.doIt,
+    () => (state: any) => ({ ...state, bar: 'yay' }),
+    true
 );
 
-test('initial', () => {
-  expect(bar.initial).toEqual({foo: 0});
+tap.same(bar.initial, { foo: 0 });
+
+tap.test('foo alone', t => {
+    t.is(foo.reducer(undefined, foo.actions.doIt()), 1);
+    t.end();
 });
 
-test('foo alone', () => {
-  expect(foo.reducer(undefined, foo.actions.doIt())).toEqual(1);
-});
+tap.test('sink mutations', t => {
+    t.same(
+        bar.reducer(undefined, bar.actions.doIt()), {
+            foo: 0,
+            bar: 'yay',
+        });
 
-test('sink mutations', () => {
-  expect(bar.reducer(undefined, bar.actions.doIt())).toEqual({
-    foo: 0,
-    bar: 'yay',
-  });
-});
-
-test('sink mutation and subduxUpreducer', () => {
-  expect(bar.reducer(undefined, bar.actions.doTheThing())).toEqual({
-    foo: 0,
-    baz: {foo: 3},
-  });
+    t.end();
 });

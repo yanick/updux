@@ -4,3 +4,8 @@ tsconfig.tsbuildinfo
 dist
 package-lock.json
 yarn.lock
+.nyc_output/
+pnpm-debug.log
+pnpm-lock.yaml
+yarn-error.log
+GPUCache/

@@ -1,6 +1,7 @@
-<!-- docs/_sidebar.md -->
-
-* [Home](/)
-* [Concepts](concepts.md)
-* API Reference
-    * [Updux](updux.md)
+  - [README](/README.md)
+  - [Tutorial](/tutorial.md)
+  - [Concepts](/concepts.md)
+  - [Recipes](/recipes.md)
+  - API
+    - [Top-level exports](/exports.md)
+    - [main index](/API/globals.md)

@@ -1,36 +1,38 @@
 import u from 'updeep';
-import { action, payload } from 'ts-action';
+import { action } from 'ts-action';
+import tap from 'tap';
+import sinon from 'sinon';
 
-import Updux from '.';
+import Updux, { dux, subEffects } from '.';
 import mwUpdux from './middleware_aux';
 
-test('simple effect', () => {
-    const tracer = jest.fn();
+tap.test('simple effect', async t => {
+    const tracer = sinon.fake();
 
     const store = new Updux({
         effects: {
-            foo: (api: any) => (next: any) => (action: any) => {
+            foo: () => (next: any) => (action: any) => {
                 tracer();
                 next(action);
             },
         },
     }).createStore();
 
-    expect(tracer).not.toHaveBeenCalled();
+    t.ok(!tracer.called);
 
     store.dispatch({ type: 'bar' });
 
-    expect(tracer).not.toHaveBeenCalled();
+    t.ok(!tracer.called);
 
-    store.dispatch.foo();
+    store.dispatch( (store as any).actions.foo() );
 
-    expect(tracer).toHaveBeenCalled();
+    t.ok(tracer.called);
 });
 
-test('effect and sub-effect', () => {
-    const tracer = jest.fn();
+tap.test('effect and sub-effect', async t => {
+    const tracer = sinon.fake();
 
-    const tracerEffect = (signature: string) => (api: any) => (next: any) => (
+    const tracerEffect = (signature: string) => () => (next: any) => (
         action: any
     ) => {
         tracer(signature);
@@ -42,87 +44,86 @@ test('effect and sub-effect', () => {
             foo: tracerEffect('root'),
         },
         subduxes: {
-            zzz: {
+            zzz: dux({
                 effects: {
                     foo: tracerEffect('child'),
                 },
-            },
+            }),
         },
     }).createStore();
 
-    expect(tracer).not.toHaveBeenCalled();
+    t.ok(!tracer.called);
 
     store.dispatch({ type: 'bar' });
 
-    expect(tracer).not.toHaveBeenCalled();
+    t.ok(!tracer.called);
 
-    store.dispatch.foo();
+    store.dispatch( (store.actions as any).foo() );
 
-    expect(tracer).toHaveBeenNthCalledWith(1, 'root');
-    expect(tracer).toHaveBeenNthCalledWith(2, 'child');
+    t.is( tracer.firstCall.lastArg, 'root' );
+    t.is( tracer.secondCall.lastArg, 'child' );
 });
 
-describe('"*" effect', () => {
-    test('from the constructor', () => {
-        const tracer = jest.fn();
+tap.test('"*" effect', async t => {
+    t.test('from the constructor', async t => {
+    const tracer = sinon.fake();
 
         const store = new Updux({
             effects: {
-                '*': api => next => action => {
+                '*': () => next => action => {
                     tracer();
                     next(action);
                 },
             },
         }).createStore();
 
-        expect(tracer).not.toHaveBeenCalled();
+        t.ok(!tracer.called);
 
         store.dispatch({ type: 'bar' });
+        t.ok(tracer.called);
 
-        expect(tracer).toHaveBeenCalled();
     });
 
-    test('from addEffect', () => {
-        const tracer = jest.fn();
+    t.test('from addEffect', async t => {
+    const tracer = sinon.fake();
 
         const updux = new Updux({});
 
-        updux.addEffect('*', api => next => action => {
+        updux.addEffect('*', () => next => action => {
             tracer();
             next(action);
         });
 
-        expect(tracer).not.toHaveBeenCalled();
+        t.ok(!tracer.called);
 
         updux.createStore().dispatch({ type: 'bar' });
 
-        expect(tracer).toHaveBeenCalled();
+        t.ok(tracer.called);
     });
 
-    test('action can be modified', () => {
+    t.test('action can be modified', async t => {
 
         const mw = mwUpdux.middleware;
 
-        const next = jest.fn();
+    const next = sinon.fake();
 
         mw({dispatch:{}} as any)(next as any)({type: 'bar'});
 
-        expect(next).toHaveBeenCalled();
-
-        expect(next.mock.calls[0][0]).toMatchObject({meta: 'gotcha'});
+        t.ok(next.called);
+        t.match( next.firstCall.args[0], {meta: 'gotcha' } );
     });
 });
 
-test('async effect', async () => {
+tap.test('async effect', async t => {
     function timeout(ms: number) {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    const tracer = jest.fn();
+    const tracer = sinon.fake();
 
     const store = new Updux({
         effects: {
-            foo: api => next => async action => {
+            foo: () => next => async action => {
                 next(action);
                 await timeout(1000);
                 tracer();
@@ -130,28 +131,26 @@ test('async effect', async () => {
         },
     }).createStore();
 
-    expect(tracer).not.toHaveBeenCalled();
+    t.ok(!tracer.called);
 
-    store.dispatch.foo();
+    store.dispatch( (store.actions as any).foo() );
 
-    expect(tracer).not.toHaveBeenCalled();
+    t.ok(!tracer.called);
 
     await timeout(1000);
 
-    expect(tracer).toHaveBeenCalled();
+    t.ok(tracer.called);
 });
 
-test('getState is local', () => {
+tap.test('getState is local', async t => {
     let childState;
     let rootState;
-    let rootFromChild;
 
     const child = new Updux({
         initial: { alpha: 12 },
         effects: {
-            doIt: ({ getState, getRootState }) => next => action => {
+            doIt: ({ getState }) => next => action => {
                 childState = getState();
-                rootFromChild = getRootState();
                 next(action);
             },
         },
@@ -159,7 +158,7 @@ test('getState is local', () => {
 
     const root = new Updux({
         initial: { beta: 24 },
-        subduxes: { child },
+        subduxes: { child: child.asDux },
         effects: {
             doIt: ({ getState }) => next => action => {
                 rootState = getState();
@@ -169,17 +168,13 @@ test('getState is local', () => {
     });
 
     const store = root.createStore();
-    store.dispatch.doIt();
+    store.dispatch( (store.actions as any).doIt() );
 
-    expect(rootState).toEqual({ beta: 24, child: { alpha: 12 } });
-    expect(rootFromChild).toEqual({ beta: 24, child: { alpha: 12 } });
-    expect(childState).toEqual({ alpha: 12 });
+    t.match(rootState,{ beta: 24, child: { alpha: 12 } });
+    t.match(childState,{ alpha: 12 });
 });
 
-test('middleware as map', () => {
-    let childState;
-    let rootState;
-    let rootFromChild;
+tap.test('middleware as map', async t => {
 
     const doIt = action('doIt', () => ({payload: ''}));
 
@@ -200,12 +195,13 @@ test('middleware as map', () => {
         ],
     });
 
+
     const root = new Updux({
         initial: { message: '' },
-        subduxes: { child },
+        subduxes: { child: child.asDux },
         effects: [
             [
-                '^',
+                '*',
                 () => next => action => {
                     next(
                         u({ payload: (p: string) => p + 'Pre' }, action) as any
@@ -231,8 +227,9 @@ test('middleware as map', () => {
                     );
                 },
             ],
+            subEffects,
             [
-                '$',
+                '*',
                 () => next => action => {
                     next(
                         u({ payload: (p: string) => p + 'End' }, action) as any
@@ -244,12 +241,13 @@ test('middleware as map', () => {
     });
 
     const store = root.createStore();
-    store.dispatch.doIt('');
+    const actions: any = store.actions;
+    store.dispatch( actions.doIt('') );
 
-    expect(store.getState()).toEqual({ message: 'PreRootAfterChildEnd' });
+    t.same(store.getState(),{ message: 'PreRootAfterChildEnd' });
 });
 
-test('generator', () => {
+tap.test('generator', async t => {
     const updux = new Updux({
         initial: 0,
         mutations: [['doIt', payload => () => payload]],
@@ -267,13 +265,14 @@ test('generator', () => {
     });
 
     const store1 = updux.createStore();
-    store1.dispatch.doIt();
-    expect(store1.getState()).toEqual(1);
-    store1.dispatch.doIt();
-    expect(store1.getState()).toEqual(2);
-    updux.actions;
+    store1.dispatch( (store1 as any).actions.doIt() );
+
+    t.is(store1.getState(),1);
+    store1.dispatch( (store1 as any).actions.doIt() );
+
+    t.is(store1.getState(),2);
 
     const store2 = updux.createStore();
-    store2.dispatch.doIt();
-    expect(store2.getState()).toEqual(1);
+    store2.dispatch( (store2 as any).actions.doIt() );
+    t.is(store2.getState(),1);
 });

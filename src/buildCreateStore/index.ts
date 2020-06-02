@@ -3,29 +3,28 @@ import {
   applyMiddleware,
   Middleware,
   Reducer,
-  PreloadedState
+  PreloadedState,
+  Store,
 } from 'redux';
-import { ActionCreator, Dictionary } from '../types';
 
-function buildCreateStore<S>(
+function buildCreateStore<S,A = {}>(
   reducer: Reducer<S>,
-  initial: PreloadedState<S>,
   middleware: Middleware,
-  actions: Dictionary<ActionCreator>,
-) {
-  return () => {
+  actions: A = {} as A,
+): (initial?: S, injectEnhancer?: Function) => Store<S> & { actions: A } {
+  return function createStore(initial?: S, injectEnhancer?: Function ): Store<S> & { actions: A } {
+
+    let enhancer = injectEnhancer ? injectEnhancer(middleware) : applyMiddleware(middleware);
+
     const store = reduxCreateStore(
       reducer,
-      initial,
-      applyMiddleware(middleware),
+      initial as PreloadedState<S>,
+      enhancer
     );
-    for (let a in actions) {
-      ( store.dispatch as any)[a] = (...args: any[]) => {
-        store.dispatch(actions[a](...args));
-      };
-    }
 
-    return store;
+    (store as any).actions = actions;
+
+    return store as any;
   };
 }
 
