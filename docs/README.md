@@ -5,7 +5,7 @@ So, I'm a fan of [Redux](https://redux.js.org).
 
 As I was looking into tools to help cut on its boilerplate,
 I came across [rematch](https://rematch.github.io/rematch). 
-It has a few pretty darn good ideas.
+It has some pretty darn good ideas.
 Keeping mutations and asynchronous effects close to the 
 reducer definition? Nice. Automatically infering the 
 actions from the said mutations and effects? Genius!
@@ -19,7 +19,7 @@ to work with `updeep` and to fit my peculiar needs. It offers features such as
 
 * Mimic the way VueX has mutations (reducer reactions to specific actions) and
     effects (middleware reacting to actions that can be asynchronous and/or
-    have side-effects), so everything pertaining to a store are all defined
+    have side-effects), so all things pertaining to a store are defined
     in the space place.
 * Automatically gather all actions used by the updux's effects and mutations,
     and makes then accessible as attributes to the `dispatch` object of the
