@@ -3,7 +3,7 @@
 ## Mapping a mutation to all values of a state
 
 Say you have a `todos` state that is an array of `todo` sub-states. It's easy
-enough to have the main reducer maps away all items to the sub-reducer:
+enough to have the main reducer map away all items to the sub-reducer:
 
 ```
 const todo = new Updux({
