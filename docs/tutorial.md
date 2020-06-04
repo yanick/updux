@@ -7,9 +7,9 @@ This tutorial assumes that our project is written in TypeScript, and
 that we are using [updeep](https://www.npmjs.com/package/updeep) to 
 help with immutability and deep merging and [ts-action][] to manage our
 actions. This is the recommended setup, but 
-none of those two architecture
+neither of those two architecture
 decisions are mandatory; Updux is equally usable in a pure-JavaScript setting,
-and `updeep` can easily be substitued by, say, [immer][], [lodash][], or even
+and `updeep` can easily be substitued with, say, [immer][], [lodash][], or even
 just plain JavaScript. Eventually, I plan to write a version of this tutorial
 with all those different configurations.
 
@@ -99,7 +99,7 @@ todosUpdux.addMutation( add_todo, todoMutation );
 
 For TypeScript projects I recommend declaring the actions as part of the
 configuration passed to the constructors, as it makes them accessible to the class
-at compile-time, and allow Updux to auto-add them to its aggregated `actions` type.
+at compile-time, and allows Updux to auto-add them to its aggregated `actions` type.
 
 
 ```
@@ -213,7 +213,7 @@ todosUpdux.addMutation( '*', (payload,action) => state => {
 
 ## Effects
 
-In addition of mutations, Updux also provide action-specific middleware, here
+In addition to mutations, Updux also provides action-specific middleware, here
 called effects.
 
 Effects use the usual Redux middleware signature:
@@ -259,7 +259,7 @@ todosUpdux.addEffect( add_todo, populate_next_id );
 ```
 
 As for the mutations, for TypeScript projects 
-the use of `addEffect` is prefered, as the method gives visibility of the 
+the use of `addEffect` is prefered, as the method gives visibility to the 
 action and state types.
 
 ### Catch-all effect
@@ -301,7 +301,7 @@ todosUpdux.addSelector('getTodoById', ({todos}) => id => fp.find({id},todos));
 ```
 
 Here the declaration as part of the constructor configuration is prefered.
-Whereas the `addSelector` will provides the state's type as part of its
+Whereas the `addSelector` will provide the state's type as part of its
 signature, declaring the selectors via the constructors will make them visible
 via the type of the accessors `selectors`.
 
@@ -349,7 +349,7 @@ const add_todo  = action('add_todo', payload<string>() );
 const add_todo_with_id  = action('add_todo_with_id', 
     payload<{ description: string; id: number }>() );
 const todo_done = action('todo_done', payload<number>() );
-const inc_next_id = action('inc_next_id');
+const increment_next_id = action('increment_next_id'); 
 
 const todosUpdux = new Updux({
     initial: {
@@ -360,7 +360,7 @@ const todosUpdux = new Updux({
         add_todo,
         add_todo_with_id,
         todo_done,
-        inc_next_id,
+        increment_next_id,
     },
     selectors: {
         getTodoById: ({todos}) => id => fp.find({id},todos)
@@ -371,7 +371,7 @@ todosUpdux.addMutation( add_todo_with_id, payload =>
     u.updateIn( 'todos', todos => [ ...todos, { ...payload, done: false }] )
 );
 
-todosUpdux.addMutation( inc_next_id, () => u({ next_id: i => i + 1 }) );
+todosUpdux.addMutation( increment_next_id, () => u({ next_id: i => i + 1 }) );
 
 todosUpdux.addMutation( todo_done, id => u.updateIn(
     'todos', u.map( u.if( fp.matches({id}), todo => u({done: true}, todo) ) )
@@ -401,25 +401,25 @@ import { action, payload } from 'ts-action';
 import u from 'updeep';
 import fp from 'lodash/fp';
 
-const inc_next_id = action('inc_next_id');
+const increment_next_id = action('increment_next_id');
 
 const updux = new Updux({
     initial: 1,
     actions: {
-        inc_next_id,
+        increment_next_id,
     },
     selectors: {
         getNextId: state => state
     }
 });
 
-updux.addMutation( inc_next_id, () => fp.add(1) );
+updux.addMutation( increment_next_id, () => fp.add(1) );
 
 export default updux.asDux;
 
 ```
 
-Notice that here we didn't have to specify what is the type of `initial`;
+Notice that we didn't have to specify the type of `initial`;
 TypeScript figures by itself that it's a number.
 
 Also, note that we're exporting the output of the accessor `asDux` instead of
@@ -564,9 +564,9 @@ Tadah! We had to define the `add_todo` effect at the top level as it needs to
 access the `getNextId` selector from `next_id` and the `add_todo_with_id`
 action from the `todos`. 
 
-Note that the `getNextId` selector still get the
-rigth value; when aggregating subduxes selectors Updux auto-wrap them to
-access the right slice of the top object. I.e., the `getNextId` selector
+Note that the `getNextId` selector still gets the
+right value; when aggregating subduxes selectors Updux auto-wraps them to
+access the right slice of the top object. i.e., the `getNextId` selector
 at the main level is actually defined as:
 
 ```
