@@ -18,8 +18,10 @@ function buildMiddleware<S=any>(
 ): Middleware<{},S,UpduxDispatch>
  {
   return (api: MiddlewareAPI<UpduxDispatch,S>) => {
+
     for (let type in actions) {
-      api.dispatch[type] = (...args:any[]) => api.dispatch(((actions as any)[type] as any)(...args));
+      const ac = actions[type];
+      api.dispatch[type] = (...args:any[]) => api.dispatch(ac(...args));
     }
 
     return (original_next: Next)=> {

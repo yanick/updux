@@ -1,6 +1,7 @@
 {
    "dependencies": {
       "lodash": "^4.17.15",
+      "mobx": "^5.14.2",
       "redux": "^4.0.4"
    },
    "devDependencies": {
@@ -13,6 +14,7 @@
       "jest": "^24.9.0",
       "ts-jest": "^24.1.0",
       "tsd": "^0.10.0",
+      "typedoc": "^0.15.0",
       "typescript": "^3.6.4",
       "updeep": "^1.2.0"
    },
@@ -21,10 +23,10 @@
    "name": "updux",
    "description": "Updeep-friendly Redux helper framework",
    "scripts": {
-      "build": "tsc",
+      "build": "tsc && typedoc",
       "test": "jest"
    },
-   "version": "0.2.0",
+   "version": "1.0.0",
    "repository": {
       "type": "git",
       "url": "git+https://github.com/yanick/updux.git"
@@ -38,5 +40,5 @@
       "url": "https://github.com/yanick/updux/issues"
    },
    "homepage": "https://github.com/yanick/updux#readme",
-   "types": "./index.d.ts"
+   "types": "./dist/index.d.ts"
 }

@@ -7,7 +7,7 @@ const _1 = __importDefault(require("."));
 const updeep_1 = __importDefault(require("updeep"));
 const tracer = (chr) => updeep_1.default({ tracer: (s = '') => s + chr });
 test('mutations, simple', () => {
-    const dux = _1.default({
+    const dux = new _1.default({
         mutations: {
             foo: () => tracer('a'),
             '*': () => tracer('b'),
@@ -21,19 +21,19 @@ test('mutations, simple', () => {
     expect(store.getState()).toEqual({ tracer: 'bab', });
 });
 test('with subduxes', () => {
-    const dux = _1.default({
+    const dux = new _1.default({
         mutations: {
             foo: () => tracer('a'),
             '*': () => tracer('b'),
             bar: () => ({ bar }) => ({ bar, tracer: bar.tracer })
         },
         subduxes: {
-            bar: _1.default({
+            bar: {
                 mutations: {
                     foo: () => tracer('d'),
                     '*': () => tracer('e'),
                 },
-            }),
+            },
         },
     });
     const store = dux.createStore();

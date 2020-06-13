@@ -6,18 +6,34 @@ So, I'm a fan of [Redux](https://redux.js.org). Two days ago I discovered
 
 It has a couple of pretty good ideas that removes some of the 
 boilerplate. Keeping mutations and asynchronous effects close to the 
-reducer definition, à la [VueX][]? Nice. Automatically infering the 
+reducer definition? Nice. Automatically infering the 
 actions from the said mutations and effects? Genius!
 
 But it also enforces a flat hierarchy of reducers -- where
 is the fun in that? And I'm also having a strong love for
 [Updeep](https://github.com/substantial/updeep), so I want reducer state updates to leverage the heck out of it.
 
-All that to say, I had some fun yesterday and hacked a proto-lovechild
-of `Rematch` and `Updeep`, with a dash of [VueX](https://vuex.vuejs.org/) inspiration. 
-I call it... `Updux`.
+All that to say, say hello to `Updux`. Heavily inspired by `rematch`, but twisted
+to work with `updeep` and to fit my peculiar needs. It offers features such as
+
+* Mimic the way VueX has mutations (reducer reactions to specific actions) and
+    effects (middleware reacting to actions that can be asynchronous and/or
+    have side-effects), so everything pertaining to a store are all defined
+    in the space place.
+* Automatically gather all actions used by the updux's effects and mutations,
+    and makes then accessible as attributes to the `dispatch` object of the
+    store.
+* Mutations have a signature that is friendly to Updux and Immer.
+* Also, the mutation signature auto-unwrap the payload of the actions for you.
+* TypeScript types.
+
+
+Fair warning: this package is still very new, probably very buggy,
+definitively very badly documented, and very subject to changes. Caveat
+Maxima Emptor.
 
 # Synopsis
+
 ```
 import updux from 'updux';
 
@@ -29,7 +45,7 @@ const {
     actions,
     middleware,
     createStore,
-} = updux({ 
+} = new Updux({ 
     initial: {
         counter: 0,
     },
@@ -46,7 +62,10 @@ const {
         };
     },
     actions: {
-        customAction: ( someArg ) => ({ someProp: someArg }),
+        customAction: ( someArg ) => ({ 
+            type: "custom", 
+            payload: { someProp: someArg } 
+        }),
     },
 
 });
@@ -58,329 +77,104 @@ store.dispatch.inc(3);
 
 # Description
 
-`Updux` exports one function, `updux`, both as a named export and as
-its default export.
+The formal documentation of the class Updux and its associated functions and
+types can be found over [here](./docs/classes/updux.html).
 
-## helpers = updux(config);
+## Exporting upduxes
 
-`updux` is a way to minimize and simplify the boilerplate associated with the 
-creation of a `Redux` store. It takes a shorthand configuration 
-object, and generates the appropriate reducer, actions, middleware, etc. 
-In true `Redux`-like fashion, just like reducers can be composed
-of sub-reducers, upduxs can be made of sub-upduxs.
-
-### config
-
-The config object recognize following properties.
-
-#### initial
-
-The default initial state of the reducer. Can be anything your
-heart desires. 
-
-#### subduxes
-
-Object mapping slices of the state to sub-upduxs.
-
-For example, if in plain Redux you would do
+If you are creating upduxes that will be used as subduxes
+by other upduxes, or as
+[ducks](https://github.com/erikras/ducks-modular-redux)-like containers, I
+recommend that you export the Updux instance as the default export:
 
 ```
-import { combineReducers } from 'redux';
-import todosReducer from './todos';
-import statisticsReducer from './statistics';
+import Updux from 'updux';
 
-const rootReducer = combineReducers({
-    todos: todosReducer,
-    stats: statisticsReducer,
-});
+const updux = new Updux({ ... });
+
+export default updux;
 ```
 
-then with Updux you'd do 
+
+Then you can use them as subduxes like this:
 
 ```
-import { updux } from 'updux';
-import todos from './todos';
-import statistics from './statistics';
+import Updux from 'updux';
+import foo from './foo'; // foo is an Updux
+import bar from './bar'; // bar is an Updux as well
 
-const rootUpdux = updux({
+const updux = new Updux({
     subduxes: {
-        todos, statistics
+        foo, bar
     }
 });
 ```
 
-#### mutations
-
-Object mapping actions to the associated state mutation.
-
-For example, in `Redux` you'd do
+Or if you want to use it:
 
 ```
-function todosReducer(state=[],action) {
+import updux from './myUpdux';
 
-    switch(action.type) {
-        case 'ADD':  return [ ...state, action.payload ];
-
-        case 'DONE': return state.map( todo => todo.id === action.payload 
-            ? { ...todo, done: true } : todo )
-
-        default: return state;
-    }
-}
+const {
+    reducer,
+    actions: { doTheThing },
+    createStore,
+    middleware,
+} = updux;
 ```
 
-With Updux:
+## Usage with Immer
+
+While Updux was created with Updeep in mind, it also plays very
+well with [Immer](https://immerjs.github.io/immer/docs/introduction).
+
+For example, taking this basic updux:
 
 ```
-const todosUpdux = updux({
+import Updux from 'updux';
+
+const updux = new Updux({
+    initial: { counter: 0 },
     mutations: {
-        add: todo => state => [ ...state, todo ],
-        done: done_id => u.map( u.if( ({id} => id === done_id), {done: true} ) )
+        add: (inc=1) => state => { counter: counter + inc } 
     }
 });
+    
 ```
 
-The signature of the mutations is `(payload,action) => state => newState`.  
-It is designed to play well with `Updeep`. This way, instead of doing
+Converting it to Immer would look like:
+
 
 ```
-    mutation: {
-        renameTodo: newName => state => { ...state, name: newName }
-    }
-```
+import Updux from 'updux';
+import { produce } from 'Immer';
 
-we can do
-
-```
-    mutation: {
-        renameTodo: newName => u({ name: newName })
-    }
-```
-
-Also, the special key `*` can be used to match any 
-action not explicitly matched by other mutations.
-
-```
-const todosUpdux = updux({
+const updux = new Updux({
+    initial: { counter: 0 },
     mutations: {
-        add: todo => state => [ ...state, todo ],
-        done: done_id => u.map( u.if( ({id} => id === done_id), {done: true} ) ),
-        '*' (payload,action) => state => {
-            console.warn( "unexpected action ", action.type );
-            return state;
-        },
+        add: (inc=1) => produce( draft => draft.counter += inc ) } 
     }
 });
+    
 ```
 
-#### effects
+But since typing `produce` over and over is no fun, `groomMutations`
+can be used to wrap all mutations with it:
 
-Plain object defining asynchronous actions and side-effects triggered by actions.
-The effects themselves are Redux middleware, expect with the `dispatch` 
-property of the first argument augmented with all the available actions.
 
 ```
-updux({
-    effects: {
-        fetch: ({dispatch}) => next => async (action) => {
-            next(action);
+import Updux from 'updux';
+import { produce } from 'Immer';
 
-            let result = await fetch(action.payload.url).then( result => result.json() );
-            dispatch.fetchSuccess(result);
-        }
-    }
-});
-```
-
-### actions
-
-Generic action creations are automatically created from the mutations and effects, but you can 
-also define custom action creator here. The object's values are function that
-transform the arguments of the creator to the action's payload.
-
-```
-const { actions } = updox({
+const updux = new Updux({
+    initial: { counter: 0 },
+    groomMutations: mutation => (...args) => produce( mutation(...args) ),
     mutations: {
-        foo: () => state => state,
-    }
-    actions: {
-        bar: (x,y) => ({x,y})
+        add: (inc=1) => draft => draft.counter += inc 
     }
 });
-
-actions.foo({ x: 1, y: 2 }); // => { type: foo, payload: { x:1, y:2  } }
-actions.bar(1,2);            // => { type: bar, payload: { x:1, y:2  } }
-```
-
-## return value
-
-`updux` returns an object with the following properties:
-
-### initial
-
-Default initial state of the reducer. If applicable, merge
-the initial states of `config` and `subduxes`, with
-`config` having precedence over `subduxes`.
-
-If nothing was given, defaults to an empty object.
-
-### reducer
-
-A Redux reducer generated using the computed initial state and
-mutations.
-
-### mutations
-
-Merge of the config and subduxes mutations. If an action trigger
-mutations in both the main updux and its subduxes, the subduxes 
-mutations will be performed first.
-
-### actions
-
-Action creators for all actions defined or used in the actions, mutations, effects and subduxes
-of the updox config. 
-
-Non-custom action creators defined in `actions` have the signature `(payload={},meta={}) => ({type,
-payload,meta})` (with the extra sugar that if `meta` or `payload` are not
-specified, the key is not present in the produced action).
-
-If the same action appears in multiple locations, the precedence order
-determining which one will prevail is
-
-    actions generated from mutations/effects < non-custom subduxes actions <
-    custom subduxes actions < custom actions
-
-### middleware
-
-A middleware aggregating all the effects defined in the 
-updox and its subduxes. Effects of the updox itself are
-done before the subdoxes effects.
-
-### createStore
-
-Same as doing
-
-```
-import { createStore, applyMiddleware } from 'redux';
-
-const { initial, reducer, middleware, actions } = updox(...);
-
-const store = createStore( initial, reducer, applyMiddleware(middleware) );
-
-for ( let type in actions ) {
-    store.dispatch[type] = (...args) => {
-        store.dispatch(actions[type](...args))
-    };
-}
-```
-
-So that later on you can do
-
-```
-store.dispatch.addTodo(...);
-
-// still work
-store.dispatch( actions.addTodo(...) );
-```
-
-# Example
-
-#### battle.js
-
-```
-import { updux } from 'updux';
-
-import game from './game';
-import log from './log';
-import bogeys from './bogeys';
-
-const { createStore } = updux({
-    subduxes: { game, log, bogeys }
-})
-
-export default createStore;
-```
-
-#### game.js
-
-
-```
-import { updux } from 'updux';
-import _ from 'lodash';
-import u from 'updeep';
-
-import { calculateMovement } from 'game/rules';
-
-export default updux({
-    initial: { game: "", players: [], turn: 0, },
-    mutations: {
-        init_game: ({game: { name, players }}) => {name, players},
-        play_turn: () => u({ turn: x => x+1 }),
-    },
-    effects: {
-        play_turn: ({getState,dispatch}) => next => action => {
-
-            const bogeys = api.getState().bogeys;
-
-            // only allow the turn to be played if
-            // all ships have their orders in
-            if( bogeys.any( bogey => ! bogey.orders ) ) return;
-
-            bogeys.forEach( bogey => {
-                dispatch.move( calculateMovement(bogey) )
-            } );
-
-            next(action); 
-        },
-    }
-});
+    
 ```
 
 
-#### log.js
-
-```
-import { updux } from 'updux';
-
-export default updux({
-    initial: [],
-    mutations: {
-        '*': (payload,action) => state => [ ...state, action ],
-    },
-});
-```
-
-#### bogeys.js
-
-```
-import { updux } from 'updux';
-import _ from 'lodash';
-
-export default updux({
-    initial: [],
-    mutations: {
-        init_game: ({bogeys}) => () => _.keyBy( bogeys, 'id' ),
-        move: ({position}) => u({ position }),
-    },
-});
-```
-
-
-#### myGame.js
-
-```
-import Battle from './battle';
-
-const battle = Battle();
-
-battle.dispatch.init_game({
-    name: 'Gemini Prime',
-    players: [ 'yenzie' ],
-    bogeys: [ { id: 'Enkidu' } ]
-});
-
-battle.dispatch.play_game();
-
-....
-```
 

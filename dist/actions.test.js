@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const _1 = __importDefault(require("."));
 const noopEffect = () => () => () => { };
 test('actions defined in effects and mutations, multi-level', () => {
-    const { actions } = _1.default({
+    const { actions } = new _1.default({
         effects: {
             foo: noopEffect,
         },

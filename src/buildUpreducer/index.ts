@@ -4,7 +4,7 @@ import { Dictionary, Mutation, Action, Upreducer } from '../types';
 
 function buildUpreducer<S>(initial: S, mutations: Dictionary<Mutation<S>> ): Upreducer<S> {
   return (action :Action) => (state: S) => {
-    if (state === null) state = initial;
+    if (state === undefined) state = initial;
 
     const a =
       mutations[action.type] ||

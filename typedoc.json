@@ -1,5 +1,5 @@
 {
-    "theme": "minimal",
+    "theme": "default",
     "tsBuildInfoFile": true,
     "out": "docs",
     "mode": "file",

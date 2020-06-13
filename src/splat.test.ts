@@ -1,10 +1,10 @@
-import updux from '.';
+import Updux from '.';
 import u from 'updeep';
 
 const tracer = (chr:string) => u({ tracer: (s='') => s + chr });
 
 test( 'mutations, simple', () => {
-    const dux = updux({
+    const dux = new Updux({
         mutations: {
             foo: () => tracer('a'),
             '*': () => tracer('b'),
@@ -25,19 +25,19 @@ test( 'mutations, simple', () => {
 });
 
 test( 'with subduxes', () => {
-    const dux = updux({
+    const dux = new Updux({
         mutations: {
             foo: () => tracer('a'),
             '*': () => tracer('b'),
             bar: () => ({bar}:any) => ({ bar, tracer: bar.tracer })
         },
         subduxes: {
-            bar: updux({
+            bar: {
                 mutations: {
                     foo: () => tracer('d'),
-                    '*': () => tracer('e'),
+                        '*': () => tracer('e'),
                 },
-            }),
+            },
         },
     });
 

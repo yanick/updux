@@ -6,14 +6,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const _1 = __importDefault(require("."));
 test('simple effect', () => {
     const tracer = jest.fn();
-    const store = _1.default({
+    const store = (new _1.default({
         effects: {
             foo: (api) => (next) => (action) => {
                 tracer();
                 next(action);
             },
         },
-    }).createStore();
+    })).createStore();
     expect(tracer).not.toHaveBeenCalled();
     store.dispatch({ type: 'bar' });
     expect(tracer).not.toHaveBeenCalled();
@@ -26,16 +26,17 @@ test('effect and sub-effect', () => {
         tracer(signature);
         next(action);
     };
-    const store = _1.default({
+    const store = (new _1.default({
         effects: {
             foo: tracerEffect('root'),
         },
         subduxes: {
-            zzz: _1.default({ effects: {
+            zzz: { effects: {
                     foo: tracerEffect('child'),
-                } })
+                }
+            }
         },
-    }).createStore();
+    })).createStore();
     expect(tracer).not.toHaveBeenCalled();
     store.dispatch({ type: 'bar' });
     expect(tracer).not.toHaveBeenCalled();
@@ -45,14 +46,14 @@ test('effect and sub-effect', () => {
 });
 test('"*" effect', () => {
     const tracer = jest.fn();
-    const store = _1.default({
+    const store = (new _1.default({
         effects: {
             '*': api => next => action => {
                 tracer();
                 next(action);
             },
         },
-    }).createStore();
+    })).createStore();
     expect(tracer).not.toHaveBeenCalled();
     store.dispatch({ type: 'bar' });
     expect(tracer).toHaveBeenCalled();
@@ -62,7 +63,7 @@ test('async effect', async () => {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
     const tracer = jest.fn();
-    const store = _1.default({
+    const store = (new _1.default({
         effects: {
             foo: api => next => async (action) => {
                 next(action);
@@ -70,7 +71,7 @@ test('async effect', async () => {
                 tracer();
             },
         },
-    }).createStore();
+    })).createStore();
     expect(tracer).not.toHaveBeenCalled();
     store.dispatch.foo();
     expect(tracer).not.toHaveBeenCalled();

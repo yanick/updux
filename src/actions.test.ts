@@ -1,10 +1,10 @@
-import updux from '.';
+import Updux from '.';
 import u from 'updeep';
 
 const noopEffect = () => () => () => {};
 
 test('actions defined in effects and mutations, multi-level', () => {
-  const {actions} = updux({
+  const {actions} = new Updux({
     effects: {
       foo: noopEffect,
     },
