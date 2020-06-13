@@ -84,7 +84,6 @@
 								<li class="tsd-kind-type-alias tsd-has-type-parameter"><a href="globals.html#dux" class="tsd-kind-icon">Dux</a></li>
 								<li class="tsd-kind-type-alias tsd-has-type-parameter tsd-is-not-exported"><a href="globals.html#maybepayload" class="tsd-kind-icon">Maybe<wbr>Payload</a></li>
 								<li class="tsd-kind-type-alias tsd-has-type-parameter"><a href="globals.html#mutation" class="tsd-kind-icon">Mutation</a></li>
-								<li class="tsd-kind-type-alias tsd-is-not-exported"><a href="globals.html#mystate" class="tsd-kind-icon">My<wbr>State</a></li>
 								<li class="tsd-kind-type-alias tsd-is-not-exported"><a href="globals.html#next" class="tsd-kind-icon">Next</a></li>
 								<li class="tsd-kind-type-alias tsd-has-type-parameter tsd-is-not-exported"><a href="globals.html#storewithdispatchactions" class="tsd-kind-icon">Store<wbr>With<wbr>Dispatch<wbr>Actions</a></li>
 								<li class="tsd-kind-type-alias tsd-is-not-exported"><a href="globals.html#submutations" class="tsd-kind-icon">Sub<wbr>Mutations</a></li>
@@ -106,9 +105,6 @@
 								<li class="tsd-kind-function"><a href="globals.html#buildmutations" class="tsd-kind-icon">build<wbr>Mutations</a></li>
 								<li class="tsd-kind-function tsd-has-type-parameter"><a href="globals.html#buildupreducer" class="tsd-kind-icon">build<wbr>Upreducer</a></li>
 								<li class="tsd-kind-function tsd-is-not-exported"><a href="globals.html#composemutations" class="tsd-kind-icon">compose<wbr>Mutations</a></li>
-								<li class="tsd-kind-function tsd-is-not-exported"><a href="globals.html#noopeffect" class="tsd-kind-icon">noop<wbr>Effect</a></li>
-								<li class="tsd-kind-function tsd-is-not-exported"><a href="globals.html#timeout" class="tsd-kind-icon">timeout</a></li>
-								<li class="tsd-kind-function tsd-is-not-exported"><a href="globals.html#tracer" class="tsd-kind-icon">tracer</a></li>
 							</ul>
 						</section>
 					</div>
@@ -308,24 +304,6 @@
 										</ul>
 									</li>
 								</ul>
-							</li>
-						</ul>
-					</div>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-is-not-exported">
-					<a name="mystate" class="tsd-anchor"></a>
-					<h3>My<wbr>State</h3>
-					<div class="tsd-signature tsd-kind-icon">My<wbr>State<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in addMutations.test.ts:3</li>
-						</ul>
-					</aside>
-					<div class="tsd-type-declaration">
-						<h4>Type declaration</h4>
-						<ul class="tsd-parameters">
-							<li class="tsd-parameter">
-								<h5>sum<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></h5>
 							</li>
 						</ul>
 					</div>
@@ -932,7 +910,7 @@ const rootUpdux = updux({
 					<a name="buildmutations" class="tsd-anchor"></a>
 					<h3>build<wbr>Mutations</h3>
 					<ul class="tsd-signatures tsd-kind-function">
-						<li class="tsd-signature tsd-kind-icon">build<wbr>Mutations<span class="tsd-signature-symbol">(</span>mutations<span class="tsd-signature-symbol">?: </span><a href="globals.html#dictionary" class="tsd-signature-type">Dictionary</a><span class="tsd-signature-symbol">&lt;</span><a href="globals.html#mutation" class="tsd-signature-type">Mutation</a><span class="tsd-signature-symbol">&gt;</span>, subduxes<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Dictionary</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">function</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">build<wbr>Mutations<span class="tsd-signature-symbol">(</span>mutations<span class="tsd-signature-symbol">?: </span><a href="globals.html#dictionary" class="tsd-signature-type">Dictionary</a><span class="tsd-signature-symbol">&lt;</span><a href="globals.html#mutation" class="tsd-signature-type">Mutation</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Object</span><span class="tsd-signature-symbol">&gt;</span>, subduxes<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Dictionary</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">function</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
@@ -944,7 +922,7 @@ const rootUpdux = updux({
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> mutations: <a href="globals.html#dictionary" class="tsd-signature-type">Dictionary</a><span class="tsd-signature-symbol">&lt;</span><a href="globals.html#mutation" class="tsd-signature-type">Mutation</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> =&nbsp;{}</span></h5>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> mutations: <a href="globals.html#dictionary" class="tsd-signature-type">Dictionary</a><span class="tsd-signature-symbol">&lt;</span><a href="globals.html#mutation" class="tsd-signature-type">Mutation</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Object</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> =&nbsp;{}</span></h5>
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> subduxes: <span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> =&nbsp;{}</span></h5>
@@ -1050,69 +1028,6 @@ const rootUpdux = updux({
 						</li>
 					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-function tsd-is-not-exported">
-					<a name="noopeffect" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagConst">Const</span> noop<wbr>Effect</h3>
-					<ul class="tsd-signatures tsd-kind-function tsd-is-not-exported">
-						<li class="tsd-signature tsd-kind-icon">noop<wbr>Effect<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">(Anonymous function)</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in actions.test.ts:4</li>
-								</ul>
-							</aside>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">(Anonymous function)</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-function tsd-is-not-exported">
-					<a name="timeout" class="tsd-anchor"></a>
-					<h3>timeout</h3>
-					<ul class="tsd-signatures tsd-kind-function tsd-is-not-exported">
-						<li class="tsd-signature tsd-kind-icon">timeout<span class="tsd-signature-symbol">(</span>ms<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">&gt;</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in test.ts:125</li>
-								</ul>
-							</aside>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>ms: <span class="tsd-signature-type">number</span></h5>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">&gt;</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-function tsd-is-not-exported">
-					<a name="tracer" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagConst">Const</span> tracer</h3>
-					<ul class="tsd-signatures tsd-kind-function tsd-is-not-exported">
-						<li class="tsd-signature tsd-kind-icon">tracer<span class="tsd-signature-symbol">(</span>chr<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">CurriedUpdate1</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol">&gt;</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in splat.test.ts:4</li>
-								</ul>
-							</aside>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>chr: <span class="tsd-signature-type">string</span></h5>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">CurriedUpdate1</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol">&gt;</span></h4>
-						</li>
-					</ul>
-				</section>
 			</section>
 		</div>
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
@@ -1151,9 +1066,6 @@ const rootUpdux = updux({
 					</li>
 					<li class=" tsd-kind-type-alias tsd-has-type-parameter">
 						<a href="globals.html#mutation" class="tsd-kind-icon">Mutation</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-is-not-exported">
-						<a href="globals.html#mystate" class="tsd-kind-icon">My<wbr>State</a>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-is-not-exported">
 						<a href="globals.html#next" class="tsd-kind-icon">Next</a>
@@ -1202,15 +1114,6 @@ const rootUpdux = updux({
 					</li>
 					<li class=" tsd-kind-function tsd-is-not-exported">
 						<a href="globals.html#composemutations" class="tsd-kind-icon">compose<wbr>Mutations</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-not-exported">
-						<a href="globals.html#noopeffect" class="tsd-kind-icon">noop<wbr>Effect</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-not-exported">
-						<a href="globals.html#timeout" class="tsd-kind-icon">timeout</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-not-exported">
-						<a href="globals.html#tracer" class="tsd-kind-icon">tracer</a>
 					</li>
 				</ul>
 			</nav>

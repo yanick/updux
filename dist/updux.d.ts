@@ -22,9 +22,10 @@ export declare class Updux<S = any> {
     readonly upreducer: Upreducer<S>;
     readonly reducer: (state: S | undefined, action: Action) => S;
     readonly mutations: Dictionary<Mutation<S>>;
+    readonly subduxUpreducer: Upreducer<any>;
     readonly createStore: () => StoreWithDispatchActions<S>;
     readonly asDux: Dux<S>;
-    addMutation<A extends ActionCreator>(creator: A, mutation: Mutation<S, A extends (...args: any[]) => infer R ? R : never>): void;
+    addMutation<A extends ActionCreator>(creator: A, mutation: Mutation<S, A extends (...args: any[]) => infer R ? R : never>, isSink?: boolean): void;
 }
 export default Updux;
 //# sourceMappingURL=updux.d.ts.map
