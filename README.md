@@ -77,7 +77,7 @@ store.dispatch.inc(3);
 
 # Description
 
-Full documentation can be [found here](https://yanick.github.io/updux/docs/).
+Full documentation can be [found here](https://yanick.github.io/updux/).
 
 ## Exporting upduxes
 
