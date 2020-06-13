@@ -1,5 +1,5 @@
-import { UpduxConfig, Dictionary, Action, ActionCreator, Mutation, Upreducer, UpduxDispatch } from './types';
-import { Middleware, Store } from 'redux';
+import { UpduxConfig, Dictionary, Action, ActionCreator, Mutation, Upreducer, UpduxMiddleware } from './types';
+import { Store } from 'redux';
 export { actionCreator } from './buildActions';
 declare type StoreWithDispatchActions<S = any, Actions = {
     [action: string]: (...args: any) => Action;
@@ -17,7 +17,7 @@ export declare class Updux<S = any> {
     private localActions;
     private localMutations;
     constructor(config?: UpduxConfig);
-    readonly middleware: Middleware<{}, S, UpduxDispatch>;
+    readonly middleware: UpduxMiddleware<S>;
     readonly actions: Dictionary<ActionCreator>;
     readonly upreducer: Upreducer<S>;
     readonly reducer: (state: S | undefined, action: Action) => S;

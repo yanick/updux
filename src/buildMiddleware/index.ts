@@ -1,7 +1,7 @@
 import fp from 'lodash/fp';
 
 import { Middleware, MiddlewareAPI, Dispatch } from 'redux';
-import { Dictionary, ActionCreator, Action, UpduxDispatch } from '../types';
+import { Dictionary, ActionCreator, Action, UpduxDispatch, UpduxMiddleware, UpduxMiddlewareAPI } from '../types';
 
 const MiddlewareFor = (type: any, mw: Middleware ): Middleware => api => next => action => {
     if (type !== '*' && action.type !== type) return next(action);
@@ -11,13 +11,29 @@ const MiddlewareFor = (type: any, mw: Middleware ): Middleware => api => next =>
 
 type Next = (action: Action) => any;
 
+function sliceMw( slice: string, mw: Middleware ): Middleware {
+    return (api) => {
+        const getSliceState = () => fp.get(slice, api.getState() );
+        const getRootState = (api as any).getRootState || api.getState;
+        return mw({...api, getState: getSliceState, getRootState} as any )
+    };
+}
+
 function buildMiddleware<S=any>(
-    effects : Dictionary<Middleware<{},S,UpduxDispatch>>= {},
+    effects : Dictionary<UpduxMiddleware<S>>= {},
     actions : Dictionary<ActionCreator>= {},
-    subMiddlewares :Middleware<{},S,UpduxDispatch>[] = [],
-): Middleware<{},S,UpduxDispatch>
+    subduxes :any = {},
+): UpduxMiddleware<S>
  {
-  return (api: MiddlewareAPI<UpduxDispatch,S>) => {
+
+    const subMiddlewares = fp.flow(
+        fp.mapValues( fp.get('middleware') ),
+        fp.toPairs,
+        fp.filter(x=>x[1]),
+        fp.map( ([ slice, mw ]: [ string, Middleware]) => sliceMw(slice,mw) )
+    )( subduxes );
+
+  return (api: UpduxMiddlewareAPI<S>) => {
 
     for (let type in actions) {
       const ac = actions[type];

@@ -29,7 +29,7 @@ class Updux {
         this.localMutations = fp_1.default.mapValues((m) => this.groomMutations(m))(fp_1.default.getOr({}, 'mutations', config));
     }
     get middleware() {
-        return buildMiddleware_1.default(this.localEffects, this.actions, Object.values(this.subduxes).map(sd => sd.middleware));
+        return buildMiddleware_1.default(this.localEffects, this.actions, this.subduxes);
     }
     get actions() {
         return buildActions_1.default(this.localActions, [...Object.keys(this.localMutations), ...Object.keys(this.localEffects)], fp_1.default.flatten(Object.values(this.subduxes).map(({ actions }) => Object.entries(actions))));

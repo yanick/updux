@@ -6,14 +6,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const _1 = __importDefault(require("."));
 test('simple effect', () => {
     const tracer = jest.fn();
-    const store = (new _1.default({
+    const store = new _1.default({
         effects: {
             foo: (api) => (next) => (action) => {
                 tracer();
                 next(action);
             },
         },
-    })).createStore();
+    }).createStore();
     expect(tracer).not.toHaveBeenCalled();
     store.dispatch({ type: 'bar' });
     expect(tracer).not.toHaveBeenCalled();
@@ -26,17 +26,18 @@ test('effect and sub-effect', () => {
         tracer(signature);
         next(action);
     };
-    const store = (new _1.default({
+    const store = new _1.default({
         effects: {
             foo: tracerEffect('root'),
         },
         subduxes: {
-            zzz: { effects: {
+            zzz: {
+                effects: {
                     foo: tracerEffect('child'),
-                }
-            }
+                },
+            },
         },
-    })).createStore();
+    }).createStore();
     expect(tracer).not.toHaveBeenCalled();
     store.dispatch({ type: 'bar' });
     expect(tracer).not.toHaveBeenCalled();
@@ -46,14 +47,14 @@ test('effect and sub-effect', () => {
 });
 test('"*" effect', () => {
     const tracer = jest.fn();
-    const store = (new _1.default({
+    const store = new _1.default({
         effects: {
             '*': api => next => action => {
                 tracer();
                 next(action);
             },
         },
-    })).createStore();
+    }).createStore();
     expect(tracer).not.toHaveBeenCalled();
     store.dispatch({ type: 'bar' });
     expect(tracer).toHaveBeenCalled();
@@ -63,7 +64,7 @@ test('async effect', async () => {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
     const tracer = jest.fn();
-    const store = (new _1.default({
+    const store = new _1.default({
         effects: {
             foo: api => next => async (action) => {
                 next(action);
@@ -71,11 +72,41 @@ test('async effect', async () => {
                 tracer();
             },
         },
-    })).createStore();
+    }).createStore();
     expect(tracer).not.toHaveBeenCalled();
     store.dispatch.foo();
     expect(tracer).not.toHaveBeenCalled();
     await timeout(1000);
     expect(tracer).toHaveBeenCalled();
+});
+test('getState is local', () => {
+    let childState;
+    let rootState;
+    let rootFromChild;
+    const child = new _1.default({
+        initial: { alpha: 12 },
+        effects: {
+            doIt: ({ getState, getRootState }) => next => action => {
+                childState = getState();
+                rootFromChild = getRootState();
+                next(action);
+            },
+        },
+    });
+    const root = new _1.default({
+        initial: { beta: 24 },
+        subduxes: { child },
+        effects: {
+            doIt: ({ getState }) => next => action => {
+                rootState = getState();
+                next(action);
+            },
+        },
+    });
+    const store = root.createStore();
+    store.dispatch.doIt();
+    expect(rootState).toEqual({ beta: 24, child: { alpha: 12 } });
+    expect(rootFromChild).toEqual({ beta: 24, child: { alpha: 12 } });
+    expect(childState).toEqual({ alpha: 12 });
 });
 //# sourceMappingURL=middleware.test.js.map

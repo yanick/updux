@@ -17,6 +17,7 @@ import {
   Mutation,
   Upreducer,
   UpduxDispatch,
+  UpduxMiddleware
 } from './types';
 
 import {Middleware, Store} from 'redux';
@@ -98,7 +99,7 @@ export class Updux<S = any> {
   groomMutations: (mutation: Mutation<S>) => Mutation<S>;
 
   @observable private localEffects: Dictionary<
-    Middleware<{}, S, UpduxDispatch>
+    UpduxMiddleware<S>
   >;
 
   @observable private localActions: Dictionary<ActionCreator>;
@@ -132,12 +133,15 @@ export class Updux<S = any> {
    * A middleware aggregating all the effects defined in the
    * updux and its subduxes. Effects of the updux itself are
    * done before the subduxes effects.
+   * Note that `getState` will always return the state of the
+   * local updux. The function `getRootState` is provided
+   * alongside `getState` to get the root state.
    */
-  @computed get middleware(): Middleware<{}, S, UpduxDispatch> {
+  @computed get middleware(): UpduxMiddleware<S> {
     return buildMiddleware(
       this.localEffects,
       this.actions,
-      Object.values(this.subduxes).map(sd => sd.middleware),
+      this.subduxes,
     );
   }
 
