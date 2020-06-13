@@ -45,6 +45,9 @@ const {
             next(action);
         };
     },
+    actions: {
+        customAction: ( someArg ) => ({ someProp: someArg }),
+    },
 
 });
 
@@ -104,7 +107,6 @@ const rootUpdux = updux({
         todos, statistics
     }
 });
-```
 
 #### mutations
 
@@ -187,7 +189,25 @@ updux({
         }
     }
 });
+
+### actions
+
+Generic action creations are automatically created from the mutations and effects, but you can 
+also define custom action creator here. The object's values are function that
+transform the arguments of the creator to the action's payload.
+
 ```
+const { actions } = updox({
+    mutations: {
+        foo: () => state => state,
+    }
+    actions: {
+        bar: (x,y) => ({x,y})
+    }
+});
+
+actions.foo({ x: 1, y: 2 }); // => { type: foo, payload: { x:1, y:2  } }
+actions.bar(1,2);            // => { type: bar, payload: { x:1, y:2  } }
 
 
 ## return value
@@ -215,12 +235,18 @@ mutations will be performed first.
 
 ### actions
 
-Action creators for all actions used in the mutations, effects and subdox
+Action creators for all actions defined or used in the actions, mutations, effects and subduxes
 of the updox config. 
 
-The action creators have the signature `(payload={},meta={}) => ({type,
+Non-custom action creators defined in `actions` have the signature `(payload={},meta={}) => ({type,
 payload,meta})` (with the extra sugar that if `meta` or `payload` are not
 specified, the key is not present in the produced action).
+
+If the same action appears in multiple locations, the precedence order
+determining which one will prevail is
+
+    actions generated from mutations/effects < non-custom subduxes actions <
+    custom subduxes actions < custom actions
 
 ### middleware
 
