@@ -1,59 +1,22 @@
 import fp from 'lodash/fp';
-import { Action, ActionCreator, ActionPayloadGenerator, Dictionary } from '../types';
+import {
+    ActionCreator
+} from 'ts-action';
 
-export function actionCreator<T extends string,P extends any>( type: T, transform: (...args: any[]) => P ): ActionCreator<T,P>
-export function actionCreator<T extends string>( type: T, transform: never ): ActionCreator<T,undefined>
-export function actionCreator<T extends string>( type: T, transform: null ): ActionCreator<T,null>
-export function actionCreator(type:any, transform:any ) {
+import {
+    Dictionary,
+} from '../types';
 
-    if( transform ) {
-        return Object.assign(
-            (...args: any[]) => ({ type, payload: transform(...args) }),
-                { type } )
-    }
+type ActionPair = [string, ActionCreator];
 
-    if( transform === null ) {
-        return Object.assign( () => ({ type }), { type } )
-    }
-
-    return Object.assign( (payload: unknown) => ({type, payload}) );
-}
-
-function actionFor(type:string): ActionCreator {
-  const f = ( (payload = undefined, meta = undefined) =>
-    fp.pickBy(v => v !== undefined)({type, payload, meta}) as Action
-  );
-
-  return Object.assign(f, {
-      _genericAction: true,
-      type
-  });
-}
-
-type ActionPair = [ string, ActionCreator ];
-
-function buildActions(
-  generators : Dictionary<ActionPayloadGenerator> = {},
-  actionNames: string[] = [],
-  subActions : ActionPair[] = [],
-):Dictionary<ActionCreator> {
-
+function buildActions(actions: ActionPair[] = []): Dictionary<ActionCreator<string,(...args: any) => {type: string} >>{
     // priority => generics => generic subs => craft subs => creators
 
-  const [ crafted, generic ] = fp.partition(
-      ([type,f]) => !f._genericAction
-  )( subActions );
+    const [crafted, generic] = fp.partition(([type, f]) => !f._genericAction)(
+        fp.compact(actions)
+    );
 
-    const actions : any = [
-        ...(actionNames.map( type => [ type, actionFor(type) ] )),
-        ...generic,
-        ...crafted,
-        ...Object.entries(generators).map(
-            ([type, payload]: [ string, Function ]): any => [type, (payload as any).type ? payload : (...args: any) => ({ type, payload: payload(...args) })]
-        ),
-    ];
-
-    return fp.fromPairs(actions);
+    return fp.fromPairs([...generic, ...crafted]);
 }
 
 export default buildActions;

@@ -1,38 +1,78 @@
-import Updux from '.';
-import u from 'updeep';
+import { action, payload } from 'ts-action';
 
-const noopEffect = () => () => () => {};
+import Updux, { dux } from '.';
+import { test } from 'tap';
+import { expectAssignable } from 'tsd';
 
-test('actions defined in effects and mutations, multi-level', () => {
-  const {actions} = new Updux({
-    effects: {
-      foo: noopEffect,
-    },
-    mutations: {bar: () => () => null},
-    subduxes: {
-      mysub: {
-        effects: {baz: noopEffect },
-        mutations: {quux: () => () => null},
-        actions: {
-          foo: (limit:number) => ({limit}),
-        },
-      },
-      myothersub: {
-        effects: {
-          foo: noopEffect,
-        },
-      },
-    },
-  });
+const noopEffect = () => () => () => null;
 
-  const types = Object.keys(actions);
-  types.sort();
+test(
+    'actions defined in effects and mutations, multi-level',
+    { autoend: true },
+    t => {
+        const bar = action('bar', (payload, meta) => ({ payload, meta }));
+        const foo = action('foo', (limit: number) => ({
+            payload: { limit },
+        }));
 
-  expect(types).toEqual(['bar', 'baz', 'foo', 'quux']);
+        const { actions }: any = dux({
+            effects: [[foo, noopEffect] as any],
+            mutations: [[bar, () => () => null]],
+            subduxes: {
+                mysub: dux({
+                    effects: { baz: noopEffect },
+                    mutations: { quux: () => () => null },
+                    actions: {
+                        foo,
+                    },
+                }),
+                myothersub: dux({
+                    effects: [[foo, noopEffect]],
+                }),
+            },
+        });
 
-  expect(actions.bar()).toEqual({type: 'bar'});
-  expect(actions.bar('xxx')).toEqual({type: 'bar', payload: 'xxx'});
-  expect(actions.bar(undefined, 'yyy')).toEqual({type: 'bar', meta: 'yyy'});
+        const types = Object.keys(actions);
+        types.sort();
 
-  expect(actions.foo(12)).toEqual({type: 'foo', payload: {limit: 12}});
+        t.match(types, ['bar', 'baz', 'foo', 'quux']);
+
+        t.match(actions.bar(), { type: 'bar' });
+        t.match(actions.bar('xxx'), { type: 'bar', payload: 'xxx' });
+        t.match(actions.bar(undefined, 'yyy'), {
+            type: 'bar',
+            payload: undefined,
+            meta: 'yyy',
+        });
+
+        t.same(actions.foo(12), { type: 'foo', payload: { limit: 12 } });
+    }
+);
+
+test('different calls to addAction', t => {
+    const updux = new Updux<any,any>();
+
+    updux.addAction(action('foo', payload()));
+    t.match(updux.actions.foo('yo'), {
+        type: 'foo',
+        payload: 'yo',
+    });
+
+    updux.addAction('baz', x => ({ x }));
+    t.match(updux.actions.baz(3), {
+        type: 'baz',
+        payload: { x: 3 },
+    });
+
+    t.end();
+});
+
+test('types', t => {
+    const {actions} = dux({ actions: {
+        foo: action('foo')
+    }});
+
+    expectAssignable<object>( actions );
+
+    t.end();
 });

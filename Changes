@@ -1,5 +1,8 @@
 # Revision history for Updux
 
+NEXT
+    - Mutations passed to the constructor can be arrays of arrays.
+
 1.2.0 2019-11-06
     - The middleware's 'getState' returns the local state of its updux,
         instead of the root state. Plus we add `getRootState` to get

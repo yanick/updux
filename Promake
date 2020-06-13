@@ -1,0 +1,32 @@
+#!/usr/bin/env node
+
+const Promake = require('promake');
+const glob = require('glob').sync;
+
+const {
+    task, cli, rule, exec
+} = new Promake();
+
+
+
+const compile = task( 'compile', rule( 'tsconfig.tsbuildinfo', glob('src/**.ts'),
+    async () => {
+        return exec( 'tsc' );
+    }) );
+
+const docs = task( 'docs', [ rule(
+    glob('docs/4-API/*.md'),
+    [ ...glob('./src/**.ts'), compile ], async() => {
+        await exec( "typedoc src" );
+    }
+)]);
+
+const sidebar = task(
+    'sidebar',
+    rule('./docs/_sidebar.md', [...glob('./docs/4-API/**.md'), docs], async () => {
+        return exec('docsify-auto-sidebar -d docs');
+    })
+);
+
+
+cli();

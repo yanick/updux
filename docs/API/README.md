@@ -1,3 +1,6 @@
+[updux - v1.2.0](README.md) › [Globals](globals.md)
+
+# updux - v1.2.0
 
 # What's Updux?
 
@@ -26,7 +29,6 @@ to work with `updeep` and to fit my peculiar needs. It offers features such as
 * Mutations have a signature that is friendly to Updux and Immer.
 * Also, the mutation signature auto-unwrap the payload of the actions for you.
 * TypeScript types.
-
 
 Fair warning: this package is still very new, probably very buggy,
 definitively very badly documented, and very subject to changes. Caveat
@@ -93,7 +95,6 @@ const updux = new Updux({ ... });
 
 export default updux;
 ```
-
 
 Then you can use them as subduxes like this:
 
@@ -196,7 +197,6 @@ const updux = new Updux({
 
 Converting it to Immer would look like:
 
-
 ```
 import Updux from 'updux';
 import { produce } from 'Immer';
@@ -213,7 +213,6 @@ const updux = new Updux({
 But since typing `produce` over and over is no fun, `groomMutations`
 can be used to wrap all mutations with it:
 
-
 ```
 import Updux from 'updux';
 import { produce } from 'Immer';
@@ -227,6 +226,3 @@ const updux = new Updux({
 });
     
 ```
-
-
-

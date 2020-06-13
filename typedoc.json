@@ -1,9 +1,10 @@
 {
-    "theme": "default",
-    "tsBuildInfoFile": true,
-    "out": "docs",
-    "mode": "file",
+    "theme": "markdown",
+    "out": "docs/API",
+    "mode": "modules",
     "excludePrivate": true,
-    "excludeNotExported": false,
+    "excludeNotExported": true,
+    "hideSources": true,
+    "includeVersion": true,
     "exclude": [ "src/**/*test.ts" ]
 }
