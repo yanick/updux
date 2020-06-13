@@ -1,0 +1,16 @@
+language: node_js
+
+node_js:
+  - 'node'
+  - 'lts/*'
+
+install:
+  - npm uninstall typescript --no-save
+  - npm install
+
+cache:
+  directories:
+    - node_modules
+
+git:
+  depth: 1

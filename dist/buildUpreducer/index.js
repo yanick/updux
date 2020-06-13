@@ -1,19 +1,15 @@
 "use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = buildUpreducer;
-
-var _fp = _interopRequireDefault(require("lodash/fp"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
+Object.defineProperty(exports, "__esModule", { value: true });
 function buildUpreducer(initial, mutations) {
-  return (action = {}) => state => {
-    if (state === null) state = initial;
-    const a = mutations[action.type] || mutations['*'];
-    if (!a) return state;
-    return a(action.payload, action)(state);
-  };
+    return (action) => (state) => {
+        if (state === null)
+            state = initial;
+        const a = mutations[action.type] ||
+            mutations['*'];
+        if (!a)
+            return state;
+        return a(action.payload, action)(state);
+    };
 }
+exports.default = buildUpreducer;
+//# sourceMappingURL=index.js.map

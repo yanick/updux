@@ -5,7 +5,7 @@ test('actions from mutations', () => {
     actions: {foo, bar},
   } = updux({
     mutations: {
-      foo: () => x => x,
+      foo: () => (x:any) => x,
     },
   });
 
@@ -24,11 +24,11 @@ test('reducer', () => {
   const {actions, reducer} = updux({
     initial: {counter: 1},
     mutations: {
-      inc: () => ({counter}) => ({counter: counter + 1}),
+      inc: () => ({counter}:{counter:number}) => ({counter: counter + 1}),
     },
   });
 
-  let state = reducer(null, {});
+  let state = reducer(null, {type:'noop'});
 
   expect(state).toEqual({counter: 1});
 
@@ -41,16 +41,16 @@ test( 'sub reducers', () => {
     const foo = updux({
         initial: 1,
         mutations: {
-            doFoo: () => (x) => x + 1,
-            doAll: () => x => x + 10,
+            doFoo: () => (x:number) => x + 1,
+            doAll: () => (x:number) => x + 10,
         },
     });
 
     const bar = updux({
         initial: 'a',
         mutations: {
-            doBar: () => x => x + 'a',
-            doAll: () => x => x + 'b',
+            doBar: () => (x:string) => x + 'a',
+            doAll: () => (x:string) => x + 'b',
         }
     });
 
@@ -64,7 +64,7 @@ test( 'sub reducers', () => {
 
     expect(Object.keys(actions)).toHaveLength(3);
 
-    let state = reducer(null,{});
+    let state = reducer(null,{type:'noop'});
 
     expect(state).toEqual({ foo: 1, bar: 'a' });
 
@@ -92,7 +92,7 @@ test('precedence between root and sub-reducers', () => {
             foo: { bar: 4 },
         },
         mutations: {
-            inc: () => state => {
+            inc: () => (state:any) => {
                 return {
                     ...state,
                     surprise: state.foo.bar
@@ -106,7 +106,7 @@ test('precedence between root and sub-reducers', () => {
                     quux: 3,
                 },
                 mutations: {
-                    inc: () => state => ({...state, bar: state.bar + 1 })
+                    inc: () => (state:any) => ({...state, bar: state.bar + 1 })
                 },
             }),
         }
@@ -122,7 +122,7 @@ test('precedence between root and sub-reducers', () => {
 
 });
 
-function timeout(ms) {
+function timeout(ms:number) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
@@ -133,8 +133,8 @@ test( 'middleware', async () => {
     } = updux({
         initial: "",
         mutations: {
-            inc: (addition) => state => state + addition,
-            doEeet: () => state => {
+            inc: (addition:number) => (state:number) => state + addition,
+            doEeet: () => (state:number) => {
                 return state + 'Z';
             },
         },
