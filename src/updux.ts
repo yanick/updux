@@ -81,6 +81,8 @@ export class Updux<
                Mutation<S> | [Mutation<S>, boolean | undefined]
            > = {};
 
+           private localSubscriptions: Function[] = [];
+
            get initial(): AggDuxState<S, C> {
                return buildInitial(
                    this.localInitial,
@@ -516,6 +518,12 @@ sub-state already taken care of you).
                    fp.map('selectors', this.coduxes),
                    fp.mapValues('selectors', this.subduxes)
                ) as any;
+           }
+
+           addSubscription(subscription: Function) {
+               this.localSubscriptions = [
+                   ...this.localSubscriptions, subscription
+               ];
            }
        }
 
