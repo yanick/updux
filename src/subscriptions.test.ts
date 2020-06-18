@@ -2,6 +2,7 @@ import tap from 'tap';
 import Updux from '.';
 import { action, payload } from 'ts-action';
 import u from 'updeep';
+import { produce } from 'immer';
 
 const inc = action( 'inc');
 const set_double = action( 'set_double', payload<number>() );
@@ -22,6 +23,8 @@ const dux = new Updux({
 
 dux.addSubscription(
     store => (state,unsubscribe) => {
+        console.log(state);
+
         store.dispatch(set_double(state.x*2));
     }
 );

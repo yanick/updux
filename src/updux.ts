@@ -280,12 +280,29 @@ export class Updux<
             *
             *
             */
-           get createStore() {
-               return buildCreateStore<AggDuxState<S, C>, DuxActions<A, C>>(
+           createStore(...args: any) {
+               const store = buildCreateStore<AggDuxState<S, C>, DuxActions<A, C>>(
                    this.reducer as any,
                    this.middleware as any,
                    this.actions
-               );
+               )(...args);
+
+               // do we have subscriptions? then subscribe!
+               this.localSubscriptions.forEach(sub => {
+                   //let unsub : Function;
+                   const subscriber = sub(store);
+                   let previous;
+                   let unsub = store.subscribe(
+                        () => {
+                            const state = store.getState();
+                            if( previous === state ) return;
+                            previous = state;
+                            subscriber(state,unsub);
+                        }
+                    )
+               });
+
+               return store;
            }
 
            /**
