@@ -23,7 +23,7 @@ const dux = new Updux({
 
 dux.addSubscription(
     store => (state,unsubscribe) => {
-        console.log(state);
+        if( state.x>2) return unsubscribe();
 
         store.dispatch(set_double(state.x*2));
     }
@@ -35,3 +35,7 @@ store.dispatch(inc());
 
 tap.same( store.getState(), { x:1, double: 2});
 
+store.dispatch(inc());
+store.dispatch(inc());
+
+tap.same( store.getState(), { x:3, double: 4},'we unsubscribed');

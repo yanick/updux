@@ -287,14 +287,21 @@ export class Updux<
                    this.actions
                )(...args);
 
+               this._subscribeToStore(store);
+
+               return store;
+           }
+
+           _subscribeToStore(store: any, slice : string[] = []) {
                // do we have subscriptions? then subscribe!
                this.localSubscriptions.forEach(sub => {
                    //let unsub : Function;
                    const subscriber = sub(store);
-                   let previous;
+                   let previous: any;
                    let unsub = store.subscribe(
                         () => {
-                            const state = store.getState();
+                            const state = slice.length > 0 ?
+                                fp.get(slice, store.getState()) : store.getState();
                             if( previous === state ) return;
                             previous = state;
                             subscriber(state,unsub);
@@ -302,7 +309,6 @@ export class Updux<
                     )
                });
 
-               return store;
            }
 
            /**
