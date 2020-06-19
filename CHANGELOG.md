@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.1.0](https://github.com/yanick/updux/compare/v2.0.0...v2.1.0) (2020-06-19)
+
+
+### Features
+
+* add support for subscriptions ([9c45ee7](https://github.com/yanick/updux/commit/9c45ee7efcb623defb9da5d01165fbad0e4424f9))
+
 ## [2.0.0](https://github.com/yanick/updux/compare/v1.2.0...v2.0.0) (2020-06-13)
 
 

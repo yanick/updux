@@ -43,9 +43,11 @@
     "scripts": {
         "docsify:serve": "docsify serve docs",
         "build": "tsc",
-        "test": "tap src/**test.ts"
+        "test": "tap src/**test.ts",
+        "lint": "prettier -c --",
+        "lint:fix": "prettier --write --"
     },
-    "version": "2.0.0",
+    "version": "2.1.0",
     "repository": {
         "type": "git",
         "url": "git+https://github.com/yanick/updux.git"
