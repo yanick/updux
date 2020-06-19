@@ -1,19 +1,19 @@
 # Tutorial
 
-This tutorial walks you through the features of `Updux` using the 
+This tutorial walks you through the features of `Updux` using the
 time-honored example of the implementation of Todo list store.
 
-This tutorial assumes that our project is written in TypeScript, and 
-that we are using [updeep](https://www.npmjs.com/package/updeep) to 
+This tutorial assumes that our project is written in TypeScript, and
+that we are using [updeep](https://www.npmjs.com/package/updeep) to
 help with immutability and deep merging and [ts-action][] to manage our
-actions. This is the recommended setup, but 
+actions. This is the recommended setup, but
 neither of those two architecture
 decisions are mandatory; Updux is equally usable in a pure-JavaScript setting,
 and `updeep` can easily be substitued with, say, [immer][], [lodash][], or even
 just plain JavaScript. Eventually, I plan to write a version of this tutorial
 with all those different configurations.
 
-Also, the code used here is also available in the project repository, in the 
+Also, the code used here is also available in the project repository, in the
 `src/tutorial` directory.
 
 ## Definition of the state
@@ -46,7 +46,7 @@ const todosUpdux = new Updux({
 });
 ```
 
-Note that we explicitly cast the initial state as `as TodoStore`. This lets 
+Note that we explicitly cast the initial state as `as TodoStore`. This lets
 Updux know what is the store's state.
 
 This being said, congrats! You have written your first Updux object. It
@@ -56,7 +56,7 @@ initial state will be automatically set:
 ```
 const store = todosUpdux.createStore();
 
-console.log(store.getState()); 
+console.log(store.getState());
 // { next_id: 1, todos: [] }
 ```
 
@@ -71,7 +71,7 @@ const add_todo  = action('add_todo', payload<string>() );
 const todo_done = action('todo_done', payload<number>() );
 ```
 
-Now, there is a lot of ways to add actions to a Updux object. 
+Now, there is a lot of ways to add actions to a Updux object.
 
 It can be defined when the object is created:
 
@@ -101,7 +101,6 @@ For TypeScript projects I recommend declaring the actions as part of the
 configuration passed to the constructors, as it makes them accessible to the class
 at compile-time, and allows Updux to auto-add them to its aggregated `actions` type.
 
-
 ```
 const todosUpdux = new Updux({
     actions: {
@@ -121,7 +120,7 @@ const myAction = ( todosUpdux.actions as any).todo_done(1);
 
 ### Accessing actions
 
-Once an action is defined, its creator is accessible via the `actions` accessor. 
+Once an action is defined, its creator is accessible via the `actions` accessor.
 
 ```
 console.log( todosUpdux.actions.add_todo('write tutorial') );
@@ -195,8 +194,8 @@ todos.addMutation( add_todo, description => ({next_id: id, todos}) => {
 });
 ```
 
-This time around, if the project is using TypeScript then the addition of 
-mutations via `addMutation` is encouraged, as the method signature 
+This time around, if the project is using TypeScript then the addition of
+mutations via `addMutation` is encouraged, as the method signature
 has visibility of the types of the action and state.
 
 ### Leftover mutation
@@ -210,7 +209,6 @@ todosUpdux.addMutation( '*', (payload,action) => state => {
 });
 ```
 
-
 ## Effects
 
 In addition to mutations, Updux also provides action-specific middleware, here
@@ -221,13 +219,13 @@ Effects use the usual Redux middleware signature:
 ```
 import u from 'updeep';
 
-// we want to decouple the increment of next_id and the creation of 
+// we want to decouple the increment of next_id and the creation of
 // a new todo. So let's use a new version of the action 'add_todo'.
 
 const add_todo_with_id = action('add_todo_with_id', payload<{description: string; id?: number}>() );
 const inc_next_id = action('inc_next_id');
 
-const populate_next_id = ({ getState, dispatch }) => next => action => { 
+const populate_next_id = ({ getState, dispatch }) => next => action => {
     const { next_id: id } = getState();
 
     dispatch(inc_next_id());
@@ -258,13 +256,13 @@ const todosUpdux = new Updux({
 todosUpdux.addEffect( add_todo, populate_next_id );
 ```
 
-As for the mutations, for TypeScript projects 
-the use of `addEffect` is prefered, as the method gives visibility to the 
+As for the mutations, for TypeScript projects
+the use of `addEffect` is prefered, as the method gives visibility to the
 action and state types.
 
 ### Catch-all effect
 
-It is possible to have an effect match all actions via the special `*` token. 
+It is possible to have an effect match all actions via the special `*` token.
 
 ```
 todosUpdux.addEffect('*', () => next => action => {
@@ -289,12 +287,12 @@ const getTodoById = ({todos}) => id => fp.find({id},todos);
 
 const todosUpdux = new Updux({
     selectors: {
-       getTodoById 
+       getTodoById
     }
 })
 ```
 
-or 
+or
 
 ```
 todosUpdux.addSelector('getTodoById', ({todos}) => id => fp.find({id},todos));
@@ -312,7 +310,7 @@ Selectors are available via the accessor `selectors`.
 ```
 const store = todosUpdux.createStore();
 
-console.log(  
+console.log(
     todosUpdux.selectors.getTodoById( store.getState() )(1)
 );
 ```
@@ -346,10 +344,10 @@ type TodoStore = {
 };
 
 const add_todo  = action('add_todo', payload<string>() );
-const add_todo_with_id  = action('add_todo_with_id', 
+const add_todo_with_id  = action('add_todo_with_id',
     payload<{ description: string; id: number }>() );
 const todo_done = action('todo_done', payload<number>() );
-const increment_next_id = action('increment_next_id'); 
+const increment_next_id = action('increment_next_id');
 
 const todosUpdux = new Updux({
     initial: {
@@ -367,7 +365,7 @@ const todosUpdux = new Updux({
     }
 });
 
-todosUpdux.addMutation( add_todo_with_id, payload => 
+todosUpdux.addMutation( add_todo_with_id, payload =>
     u.updateIn( 'todos', todos => [ ...todos, { ...payload, done: false }] )
 );
 
@@ -375,9 +373,9 @@ todosUpdux.addMutation( increment_next_id, () => u({ next_id: i => i + 1 }) );
 
 todosUpdux.addMutation( todo_done, id => u.updateIn(
     'todos', u.map( u.if( fp.matches({id}), todo => u({done: true}, todo) ) )
-) ); 
+) );
 
-todosUpdux.addEffect( add_todo, ({ getState, dispatch }) => next => action => { 
+todosUpdux.addEffect( add_todo, ({ getState, dispatch }) => next => action => {
     const { next_id: id } = getState();
 
     dispatch(inc_next_id());
@@ -474,14 +472,14 @@ import todo from './todo';
 
 type TodoState = DuxState<typeof todo>;
 
-const add_todo_with_id  = action('add_todo_with_id', 
-    payload<{ description: string; id: number }>() 
+const add_todo_with_id  = action('add_todo_with_id',
+    payload<{ description: string; id: number }>()
 );
 
 const updux = new Updux({
     initial: [] as Todo[],
     subduxes: {
-       '*': todo.upreducer 
+       '*': todo.upreducer
     },
     actions: {
         add_todo_with_id,
@@ -491,14 +489,14 @@ const updux = new Updux({
     }
 });
 
-todosUpdux.addMutation( add_todo_with_id, payload => 
+todosUpdux.addMutation( add_todo_with_id, payload =>
     todos => [ ...todos, { ...payload, done: false }]
 );
 
 export default updux.asDux;
 ```
 
-Note the special '*' subdux key used here. This
+Note the special '\*' subdux key used here. This
 allows the updux to map every item present in its
 state to a `todo` updux. See [this recipe](/recipes?id=mapping-a-mutation-to-all-values-of-a-state) for details.
 We could also have written the updux as:
@@ -519,10 +517,8 @@ const updux = new Updux({
 ```
 
 Note how we are using the `upreducer` accessor in the first case (which yields
-a reducer for the dux using the signature `(payload,action) => state =>
-new_state`) and `reducer` in the second case (which yield an equivalent
+a reducer for the dux using the signature `(payload,action) => state => new_state`) and `reducer` in the second case (which yield an equivalent
 reducer using the classic signature `(state,action) => new_state`).
-
 
 ### Main store
 
@@ -546,7 +542,7 @@ const updux = new Updux({
     }
 });
 
-todos.addEffect( add_todo, ({ getState, dispatch }) => next => action => { 
+todos.addEffect( add_todo, ({ getState, dispatch }) => next => action => {
     const id = updux.selectors.getNextId( getState() );
 
     dispatch(updux.actions.inc_next_id());
@@ -560,9 +556,9 @@ export default updux.asDux;
 
 ```
 
-Tadah! We had to define the `add_todo` effect at the top level as it needs to 
+Tadah! We had to define the `add_todo` effect at the top level as it needs to
 access the `getNextId` selector from `next_id` and the `add_todo_with_id`
-action from the `todos`. 
+action from the `todos`.
 
 Note that the `getNextId` selector still gets the
 right value; when aggregating subduxes selectors Updux auto-wraps them to
@@ -585,7 +581,7 @@ or the method `addSubscription`. The signature of a subscription is:
 ```
 
 Subscriptions registered for an updux and its subduxes are automatically
-subscribed to the store when calling `createStore`. 
+subscribed to the store when calling `createStore`.
 
 The `state` passed to the subscriptions of the subduxes is the local state.
 
@@ -598,13 +594,13 @@ Example:
 const set_nbr_todos = action('set_nbr_todos', payload() );
 
 const todos = dux({
-    initial: [], 
+    initial: [],
     subscriptions: [
         ({dispatch}) => todos => dispatch(set_nbr_todos(todos.length))
     ],
 });
 
-const myDux = dux({ 
+const myDux = dux({
     initial: {
         nbr_todos: 0
     },
@@ -632,7 +628,7 @@ export default updux.asDux;
 `asDux` returns an immutable copy of the attributes of the updux. Exporting
 this instead of the updux itself prevents unexpected modifications done
 outside of the updux declaration file. More importantly, the output of
-`asDux` has more precise typing, which in result results in better typing of 
+`asDux` has more precise typing, which in result results in better typing of
 parent upduxes using the dux as one of its subduxes.
 
 [immer]: https://www.npmjs.com/package/immer

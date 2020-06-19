@@ -15,12 +15,12 @@ const dux = new Updux({
         inc,
     },
     mutations: [
-        [inc, (payload) => u({ x: (x) => x + 1 })],
-        [set_double, (double) => u({ double })],
+        [inc, payload => u({ x: x => x + 1 })],
+        [set_double, double => u({ double })],
     ],
 });
 
-dux.addSubscription((store) => (state, unsubscribe) => {
+dux.addSubscription(store => (state, unsubscribe) => {
     if (state.x > 2) return unsubscribe();
 
     store.dispatch(set_double(state.x * 2));
@@ -37,7 +37,7 @@ store.dispatch(inc());
 
 tap.same(store.getState(), { x: 3, double: 4 }, 'we unsubscribed');
 
-tap.test('subduxes subscriptions', async (t) => {
+tap.test('subduxes subscriptions', async t => {
     const inc_top = action('inc_top');
     const inc_bar = action('inc_bar');
     const transform_bar = action('transform_bar', payload());
@@ -45,11 +45,11 @@ tap.test('subduxes subscriptions', async (t) => {
     const bar = new Updux({
         initial: 'a',
         mutations: [
-            [inc_bar, () => (state) => state + 'a'],
-            [transform_bar, (outcome) => () => outcome],
+            [inc_bar, () => state => state + 'a'],
+            [transform_bar, outcome => () => outcome],
         ],
         subscriptions: [
-            (store) => (state, unsubscribe) => {
+            store => (state, unsubscribe) => {
                 console.log({ state });
 
                 if (state.length <= 2) return;
@@ -66,19 +66,19 @@ tap.test('subduxes subscriptions', async (t) => {
         subduxes: {
             bar: bar.asDux,
         },
-        mutations: [[inc_top, () => u({ count: (count) => count + 1 })]],
+        mutations: [[inc_top, () => u({ count: count => count + 1 })]],
         effects: [
             [
                 '*',
-                () => (next) => (action) => {
-                    console.log( "before ", action.type );
+                () => next => action => {
+                    console.log('before ', action.type);
                     next(action);
                     console.log({ action });
                 },
             ],
         ],
         subscriptions: [
-            (store) => {
+            store => {
                 let previous: any;
                 return ({ count }) => {
                     if (count !== previous) {

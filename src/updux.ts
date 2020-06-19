@@ -52,7 +52,7 @@ type StoreWithDispatchActions<
 };
 
 function wrap_subscription(sub) {
-    return (store) => {
+    return store => {
         const sub_curried = sub(store);
         let previous: unknown;
 
@@ -66,7 +66,7 @@ function wrap_subscription(sub) {
 }
 
 function _subscribeToStore(store: any, subscriptions: Function[] = []) {
-    subscriptions.forEach((sub) => {
+    subscriptions.forEach(sub => {
         const subscriber = sub(store);
         let unsub = store.subscribe(() => {
             const state = store.getState();
@@ -76,7 +76,7 @@ function _subscribeToStore(store: any, subscriptions: Function[] = []) {
 }
 
 function sliced_subscription(slice, sub) {
-    return (store) => {
+    return store => {
         const sub_curried = sub(store);
 
         return (state, unsubscribe) =>
@@ -134,23 +134,23 @@ export class Updux<
         this.coduxes = config.coduxes ?? [];
         this.subduxes = config.subduxes ?? {};
 
-        Object.entries(config.actions ?? {}).forEach((args) =>
+        Object.entries(config.actions ?? {}).forEach(args =>
             (this.addAction as any)(...args)
         );
 
         this.coduxes.forEach((c: any) =>
-            Object.entries(c.actions).forEach((args) =>
+            Object.entries(c.actions).forEach(args =>
                 (this.addAction as any)(...args)
             )
         );
         Object.values(this.subduxes).forEach((c: any) => {
-            Object.entries(c.actions).forEach((args) => {
+            Object.entries(c.actions).forEach(args => {
                 (this.addAction as any)(...args);
             });
         });
 
         if (config.subscriptions) {
-            config.subscriptions.forEach((sub) => this.addSubscription(sub));
+            config.subscriptions.forEach(sub => this.addSubscription(sub));
         }
 
         this.groomMutations = config.groomMutations ?? ((x: Mutation<S>) => x);
@@ -160,7 +160,7 @@ export class Updux<
         if (!Array.isArray(effects)) {
             effects = (Object.entries(effects) as unknown) as Effect[];
         }
-        effects.forEach((effect) => (this.addEffect as any)(...effect));
+        effects.forEach(effect => (this.addEffect as any)(...effect));
 
         let mutations = config.mutations ?? [];
 
@@ -168,7 +168,7 @@ export class Updux<
             mutations = fp.toPairs(mutations);
         }
 
-        mutations.forEach((args) => (this.addMutation as any)(...args));
+        mutations.forEach(args => (this.addMutation as any)(...args));
 
         /*
 
@@ -210,7 +210,7 @@ export class Updux<
         const selectors = this.selectors;
         const actions = this.actions;
         return buildMiddleware(
-            this.localEffects.map((effect) =>
+            this.localEffects.map(effect =>
                 effectToMw(effect, actions as any, selectors as any)
             ),
             (this.coduxes as any).map(fp.get('middleware')) as any,
@@ -323,22 +323,22 @@ export class Updux<
     }
 
     /**
-      * Returns an array of all subscription functions registered for the dux.
-      * Subdux subscriptions are wrapped such that they are getting their
-      * local state. Also all subscriptions are further wrapped such that
-      * they are only called when the local state changed
-      */
+     * Returns an array of all subscription functions registered for the dux.
+     * Subdux subscriptions are wrapped such that they are getting their
+     * local state. Also all subscriptions are further wrapped such that
+     * they are only called when the local state changed
+     */
     get subscriptions() {
         let subscriptions = ([
             this.localSubscriptions,
             Object.entries(this.subduxes).map(([slice, subdux]) => {
-                return subdux.subscriptions.map((sub) =>
+                return subdux.subscriptions.map(sub =>
                     sliced_subscription(slice, sub)
                 );
             }),
         ] as any).flat(Infinity);
 
-        return subscriptions.map((sub) => wrap_subscription(sub));
+        return subscriptions.map(sub => wrap_subscription(sub));
     }
 
     /**
@@ -533,7 +533,7 @@ export class Updux<
         ])(this.subduxes);
 
         const local = groupByOrder(
-            this.localEffects.map((x) => [this, [], ...x])
+            this.localEffects.map(x => [this, [], ...x])
         );
 
         return fp.flatten(
@@ -544,7 +544,7 @@ export class Updux<
                 subs.middle,
                 subs['$'],
                 local['$'],
-            ].filter((x) => x)
+            ].filter(x => x)
         );
     }
 
@@ -566,8 +566,8 @@ sub-state already taken care of you).
     }
 
     /**
-      * Add a subscription to the dux.
-      */
+     * Add a subscription to the dux.
+     */
     addSubscription(subscription: Function) {
         this.localSubscriptions = [...this.localSubscriptions, subscription];
     }
