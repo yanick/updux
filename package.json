@@ -1,5 +1,6 @@
 {
     "dependencies": {
+        "immer": "^7.0.1",
         "lodash": "^4.17.15",
         "redux": "^4.0.5",
         "ts-action": "^11.0.0",

@@ -78,6 +78,8 @@ store.dispatch.inc(3);
 # Description
 
 Full documentation can be [found here](https://yanick.github.io/updux/).
+Right now the best way to understand the whole thing is to go
+through the [tutorial](https://yanick.github.io/updux/#/tutorial)
 
 ## Exporting upduxes
 

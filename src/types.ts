@@ -99,6 +99,7 @@ export type Dux<
     coduxes: Dux[],
     initial: AggDuxState<S,C>,
     actions: A,
+    subscriptions: Function[],
 }
 
 /**
@@ -341,6 +342,7 @@ export type UpduxConfig = Partial<{
     mutations: any,
     groomMutations: (m: Mutation) => Mutation,
     effects: any,
+    subscriptions: Function[];
 }>;
 
 

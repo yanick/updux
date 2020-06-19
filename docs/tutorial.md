@@ -573,6 +573,50 @@ at the main level is actually defined as:
 const getNextId = state => next_id.selectors.getNextId(state.next_id);
 ```
 
+## Subscriptions
+
+Subscriptions can be added by default to a updux store via the initial config
+or the method `addSubscription`. The signature of a subscription is:
+
+```
+(store) => (state,unsubscribe) => {
+    ...
+}
+```
+
+Subscriptions registered for an updux and its subduxes are automatically
+subscribed to the store when calling `createStore`. 
+
+The `state` passed to the subscriptions of the subduxes is the local state.
+
+Also, all subscriptions are wrapped such that they are called only if the
+local `state` changed since their last invocation.
+
+Example:
+
+```
+const set_nbr_todos = action('set_nbr_todos', payload() );
+
+const todos = dux({
+    initial: [], 
+    subscriptions: [
+        ({dispatch}) => todos => dispatch(set_nbr_todos(todos.length))
+    ],
+});
+
+const myDux = dux({ 
+    initial: {
+        nbr_todos: 0
+    },
+    subduxes: {
+        todos,
+    },
+    mutations: [
+        [ set_nbr_todos, nbr_todos => u({nbr_todos}) ]
+    ]
+})
+```
+
 ## Exporting upduxes
 
 As a general rule, don't directly export your upduxes, but rather use the accessor `asDux`.
